@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>数学ワークサポート（方程式・比例と反比例）</title>
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:light;
+  --paper:#fbfdff;--grid:#e1ebf7;--ink:#1f3a6e;--text:#22303f;--muted:#5d6b7c;
+  --red:#d4352c;--marker:#fff0a3;--ok:#2f8a55;--line:#c9d6e6;--chip:#eef3fa;--card:#ffffff;--gold:#c98a00;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root{color-scheme:dark;
+    --paper:#141b25;--grid:#1d2836;--ink:#9cc0ff;--text:#e4ebf3;--muted:#9aa8b8;
+    --red:#ff7a6e;--marker:#5b4e14;--ok:#6fd39a;--line:#2d3b4e;--chip:#1c2532;--card:#18212d;--gold:#ffc94d;}
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;color:var(--text);font-family:"BIZ UDPGothic","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;font-size:17px;line-height:1.7;
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:820px;margin:0 auto;padding:0 16px 80px}
+button{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:18px 0 6px}
+.top h1{font-family:"Klee One",serif;font-weight:600;color:var(--ink);font-size:clamp(24px,5.5vw,34px);margin:0;line-height:1.3}
+.small{font-size:14px;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:4px 12px;cursor:pointer}
+h2{font-family:"Klee One",serif;font-weight:600;color:var(--ink);font-size:25px;margin:6px 0 2px;line-height:1.4}
+h3{font-size:18px;margin:0 0 6px;color:var(--ink)}
+.muted{color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:16px;margin:0 0 18px}
+.btn{font-weight:700;background:var(--ink);color:var(--paper);border:none;border-radius:6px;padding:9px 18px;cursor:pointer}
+.btn.sub{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.btn.big{font-size:19px;padding:12px 22px}
+.eqt{font-family:"Klee One",serif;font-size:22px;line-height:2.1;color:var(--ink)}
+i{font-family:"Times New Roman",serif;font-style:italic;font-size:1.08em}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 2px;line-height:1.12;font-size:.82em}
+.fr>.n{border-bottom:1.5px solid currentColor;padding:0 3px}.fr>.d{padding:0 3px}
+
+/* ホーム：ステージマップ */
+.today{border:2px solid var(--ink);border-radius:8px;padding:16px;background:var(--card);margin:10px 0 22px}
+.today .lbl{font-weight:700;color:var(--red)}
+.today .nm{font-family:"Klee One",serif;font-size:26px;color:var(--ink);font-weight:600;margin:2px 0 10px}
+.bar{height:12px;border-radius:6px;background:var(--chip);border:1px solid var(--line);overflow:hidden;margin:6px 0 4px}
+.bar>span{display:block;height:100%;background:var(--ok);transition:width .4s}
+.map{list-style:none;margin:0;padding:0;position:relative}
+.map::before{content:"";position:absolute;left:23px;top:24px;bottom:24px;width:4px;background:var(--line);border-radius:2px}
+.map li{position:relative;margin:0 0 10px}
+.node{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:transparent;border:none;padding:4px 0;cursor:pointer}
+.dot{flex:none;width:50px;height:50px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:19px;background:var(--card);border:3px solid var(--line);color:var(--muted);position:relative;z-index:1}
+.node.clear .dot{background:var(--ok);border-color:var(--ok);color:var(--paper)}
+.node.next .dot{border-color:var(--red);color:var(--red);box-shadow:0 0 0 5px color-mix(in srgb,var(--red) 22%,transparent)}
+.node.boss .dot{border-radius:10px}
+.node .txt b{display:block;color:var(--ink);font-size:18px}
+.node .txt span{font-size:14px;color:var(--muted)}
+.node .badge{margin-left:auto;font-size:13px;font-weight:700;padding:2px 8px;border-radius:12px}
+.node.clear .badge{color:var(--ok);border:1px solid var(--ok)}
+.node.next .badge{color:var(--paper);background:var(--red)}
+
+/* ステージ画面 */
+.back{background:none;border:none;color:var(--ink);font-weight:700;cursor:pointer;padding:6px 0}
+.steps{display:flex;gap:0;margin:12px 0 16px;counter-reset:s}
+.steps button{flex:1;border:2px solid var(--line);background:var(--chip);padding:8px 4px;font-weight:700;color:var(--muted);cursor:pointer;font-size:15px}
+.steps button:first-child{border-radius:8px 0 0 8px}.steps button:last-child{border-radius:0 8px 8px 0}
+.steps button+button{border-left:none}
+.steps button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.steps button.ok::after{content:" ✓";color:var(--ok)}
+.steps button.on.ok::after{color:var(--marker)}
+.ex{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+@media (max-width:620px){.ex{grid-template-columns:1fr}}
+.ex>div{border-radius:4px;padding:8px 12px}
+.bad{border:2px dashed var(--red)}.good{border:2px solid var(--ok)}
+.tag{font-weight:700;font-size:15px}.bad .tag{color:var(--red)}.good .tag{color:var(--ok)}
+.ln{display:block}.ln.x{position:relative;width:fit-content}
+.ln.x::after,.qline.right::after{content:"";position:absolute;left:-4px;right:-4px;top:54%;height:3px;border-radius:2px;background:var(--red);transform:scaleX(0);transform-origin:left;animation:strike .5s .5s ease-out forwards}
+@keyframes strike{to{transform:scaleX(1)}}
+.ln.hi{width:fit-content;background:var(--marker);border-radius:2px;padding:0 6px;margin-left:-6px}
+.note{color:var(--red);font-size:15px;margin:2px 0 0}
+.rule{background:var(--marker);padding:2px 6px;border-radius:2px}
+.qline{display:block;width:100%;text-align:left;background:transparent;border:1px solid transparent;border-radius:4px;padding:0 8px;cursor:pointer;color:var(--ink)}
+.qline:hover{border-color:var(--line)}
+.qline{position:relative}.qline.right{border-color:var(--red)}.qline.right::after{animation-delay:0s;left:8px;right:auto;width:calc(100% - 16px)}
+.qline.nope{opacity:.45}
+.fb{min-height:1.7em;font-size:15px;margin-top:6px}.fb.ok{color:var(--ok)}.fb.ng{color:var(--red)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.chip{min-width:44px;padding:4px 10px;border:1px solid var(--line);background:var(--chip);border-radius:4px;cursor:pointer;font-size:15px}
+.chip.done{background:var(--ok);border-color:var(--ok);color:var(--paper)}
+.chip.cur{outline:2px solid var(--ink);outline-offset:1px}
+
+/* 式をさわるエンジン */
+.goal{font-size:15px;color:var(--muted);margin:0 0 4px}
+.eqrow{font-family:"Klee One",serif;font-size:clamp(24px,5.5vw,32px);color:var(--ink);display:flex;flex-wrap:wrap;align-items:center;gap:4px 2px;min-height:76px;padding:6px 4px;justify-content:center}
+.it{background:var(--card);border:2px solid var(--line);border-radius:8px;padding:0 8px;cursor:pointer;color:var(--ink);font-family:inherit;font-size:inherit;line-height:1.6;position:relative}
+.it:hover{border-color:var(--ink)}
+.it.grp{border-color:var(--ink);border-style:solid}
+.it.stampable{border:2px dashed var(--red)}
+.it.stamped{border:2px solid var(--red);background:color-mix(in srgb,var(--red) 10%,var(--card))}
+.it .st{position:absolute;top:-12px;right:-8px;background:var(--red);color:#fff;font-family:"BIZ UDPGothic",sans-serif;font-size:12px;border-radius:10px;padding:0 6px;line-height:1.6}
+.it.sel{border-color:var(--red);background:var(--marker)}
+.it.fixed{cursor:default;border-color:transparent;background:transparent}
+.eqs{padding:0 6px}
+.colon{padding:0 4px}
+.seesaw{display:block;margin:0 auto 4px;width:260px;max-width:70%}
+.seesaw .beam{transform-origin:130px 22px}
+.seesaw line,.seesaw path{stroke:var(--ink);stroke-width:3;fill:none}
+.seesaw text{font-size:12px;fill:var(--muted);font-family:"BIZ UDPGothic",sans-serif}
+.tools{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:8px 0}
+.tool{border:2px solid var(--ink);background:var(--card);color:var(--ink);border-radius:20px;padding:5px 14px;cursor:pointer;font-weight:700;font-size:15px}
+.tool.undo{border-color:var(--line);color:var(--muted);font-weight:400}
+.panel{border:2px solid var(--ink);border-radius:8px;padding:10px 14px;margin:8px 0;background:var(--card)}
+.panel .q{font-family:"Klee One",serif;font-size:24px;color:var(--ink)}
+.opts{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+.opt{background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:8px;padding:4px 14px;cursor:pointer;font-family:"Klee One",serif;font-size:20px}
+.opt:hover{border-color:var(--ink)}
+.opt[disabled]{opacity:.35;cursor:default;text-decoration:line-through}
+.opt.txt{font-family:"BIZ UDPGothic",sans-serif;font-size:16px;text-align:left}
+.inrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0}
+.inrow input{font-family:"Klee One",serif;font-size:22px;width:7em;padding:3px 10px;border:2px solid var(--ink);border-radius:6px;background:var(--card);color:var(--ink)}
+.hintline{font-size:15px;color:var(--ink);background:var(--marker);display:inline-block;padding:1px 8px;border-radius:3px}
+.clearbox{text-align:center;border:3px solid var(--ok);border-radius:10px;padding:12px;margin-top:10px}
+.clearbox b{font-size:22px;color:var(--ok)}
+@media (prefers-reduced-motion:no-preference){
+  .flip{animation:flip .45s ease-out}
+  @keyframes flip{0%{transform:translateY(-14px) scale(.8);opacity:.3}60%{transform:translateY(3px)}100%{transform:none;opacity:1}}
+  .pop{animation:pop .3s ease-out}
+  @keyframes pop{from{transform:scale(.9)}to{transform:none}}
+  .shake{animation:shake .4s}
+  @keyframes shake{0%,100%{transform:none}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+}
+
+/* 文章題 */
+.story{margin:0 0 8px}
+.dg{width:100%;max-width:600px;height:auto;display:block;margin:4px auto}
+.dg text{font-family:"BIZ UDPGothic",sans-serif;font-size:15px;fill:var(--text)}
+.dg .k{fill:var(--ink);font-weight:700}.dg .r{fill:var(--red)}
+.dg .bx{fill:none;stroke:var(--ink);stroke-width:2}
+.dg .bxf{fill:var(--marker);stroke:var(--ink);stroke-width:2}
+.dg .ds{fill:none;stroke:var(--red);stroke-width:2;stroke-dasharray:6 4}
+.dg .ln2{stroke:var(--muted);stroke-width:1.5;stroke-dasharray:4 4}
+.dg .ar{stroke:var(--ink);stroke-width:2;fill:none}
+.dg .slot rect{fill:var(--card);stroke:var(--red);stroke-width:2;stroke-dasharray:5 4;cursor:pointer}
+.dg .slot text{fill:var(--red);font-weight:700;cursor:pointer}
+.dg .slot.sel rect{fill:var(--marker);stroke-dasharray:none}
+.dg .slot.filled rect{stroke:var(--ok);stroke-dasharray:none;fill:color-mix(in srgb,var(--ok) 12%,var(--card))}
+.dg .slot.filled text{fill:var(--ok)}
+.pool{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.pc{background:var(--card);border:2px solid var(--ink);border-radius:20px;padding:2px 14px;cursor:pointer;font-family:"Klee One",serif;font-size:19px;color:var(--ink)}
+.pc.sel{background:var(--ink);color:var(--paper)}
+.pc.used{opacity:.3;cursor:default}
+.builder{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:10px 0;font-family:"Klee One",serif;font-size:22px;color:var(--ink)}
+.box{min-width:120px;min-height:48px;border:2px dashed var(--red);border-radius:8px;display:grid;place-items:center;padding:2px 10px;cursor:pointer;background:var(--card)}
+.box.f{border-style:solid;border-color:var(--ink)}
+.wsteps{display:flex;gap:6px;flex-wrap:wrap;font-size:14px;margin:0 0 8px}
+.wsteps span{padding:1px 8px;border-radius:12px;border:1px solid var(--line);color:var(--muted)}
+.wsteps span.on{border-color:var(--red);color:var(--red);font-weight:700}
+.wsteps span.ok{border-color:var(--ok);color:var(--ok)}
+
+/* ボス */
+.bosshead{display:flex;align-items:center;gap:14px;margin:0 0 10px}
+.bosshead svg{width:76px;height:76px;flex:none}
+.hp{flex:1}
+.hpbar{display:flex;gap:3px}
+.hpbar span{flex:1;height:14px;background:var(--red);border-radius:2px;transition:opacity .3s}
+.hpbar span.off{opacity:.15}
+.hearts{font-size:20px;letter-spacing:2px;color:var(--red)}
+
+/* 紙 */
+.plist{list-style:none;padding:0;margin:0}
+.plist li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px dotted var(--line)}
+.plist input{width:22px;height:22px;margin-top:3px;accent-color:var(--ok);flex:none}
+.rules{margin:0;padding-left:1.3em}
+
+/* アニメーション */
+#fx{position:fixed;inset:0;pointer-events:none;z-index:40;overflow:hidden}
+.fxtok{position:fixed;font-family:"Klee One",serif;font-weight:600;font-size:24px;color:var(--red);white-space:nowrap;will-change:transform;line-height:1.3}
+.fxtok.chipfly{background:var(--card);border:2px solid var(--ink);border-radius:20px;padding:2px 14px;color:var(--ink);font-size:19px}
+.fxtok.stampk{font-size:34px;border:3px solid var(--red);border-radius:8px;padding:0 8px;background:color-mix(in srgb,var(--card) 75%,transparent)}
+.fxtok.divk{background:var(--marker);border-radius:6px;padding:0 8px;color:var(--ink)}
+.fxp{position:fixed;will-change:transform}
+.dotp{width:9px;height:9px;border-radius:50%}
+.ringp{width:44px;height:44px;border-radius:50%;border:3px solid}
+.conf{width:9px;height:14px;border-radius:2px}
+.chunk{width:12px;height:12px;border-radius:2px}
+.banner{position:fixed;z-index:41;font-family:"Klee One",serif;font-weight:600;font-size:clamp(36px,9vw,64px);white-space:nowrap;text-shadow:0 3px 0 var(--card),0 -3px 0 var(--card),3px 0 0 var(--card),-3px 0 0 var(--card),0 6px 14px rgba(0,0,0,.25);pointer-events:none}
+.eqwrap{position:relative}
+.eqwrap.prop{padding:46px 0 42px}
+.arcs{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.arcs path{fill:none;stroke:var(--red);stroke-width:3;stroke-linecap:round}
+.arcs text{fill:var(--red);font-size:13px;font-weight:700;font-family:"BIZ UDPGothic",sans-serif}
+.sg{display:inline-block}
+.gin{border-radius:4px;padding:0 1px}
+.gin.done{color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.map{padding-left:48px}
+.map::before{left:71px}
+.runner{position:absolute;left:0;top:0;width:40px;height:46px;z-index:2;pointer-events:none}
+@media (prefers-reduced-motion:no-preference){
+  .runner svg{animation:bob 1.4s ease-in-out infinite}
+  .boss-idle{animation:bob 1.6s ease-in-out infinite}
+  @keyframes bob{50%{transform:translateY(-5px)}}
+  .node.next .dot{animation:glow 1.8s ease-in-out infinite}
+  @keyframes glow{50%{box-shadow:0 0 0 10px color-mix(in srgb,var(--red) 10%,transparent)}}
+}
+@media (prefers-reduced-motion:reduce){.ln.x::after,.qline.right::after{animation:none;transform:none}}
+
+/* 4章の部品 */
+.big{font-size:19px;margin:6px 0}
+.gwrap{display:flex;justify-content:center}
+.grid{width:100%;max-width:420px;height:auto;touch-action:manipulation}
+.grid .gl{stroke:var(--line);stroke-width:1}
+.grid .ax{stroke:var(--ink);stroke-width:2}
+.grid .gt{font-size:13px;fill:var(--muted);font-family:"BIZ UDPGothic",sans-serif}
+.grid .gt.it{font-style:italic;font-family:"Times New Roman",serif;font-size:16px;fill:var(--ink)}
+.grid .lp{fill:transparent;cursor:pointer}
+.grid .lp:hover{fill:var(--marker);opacity:.8}
+.grid .pt circle{fill:var(--ink)}
+.grid .pt.ok circle{fill:var(--ok)}
+.grid .pt.cur circle{fill:var(--red)}
+.grid .pt text{font-size:15px;font-weight:700;fill:var(--ink);font-family:"BIZ UDPGothic",sans-serif}
+.grid .walk{fill:none;stroke:var(--red);stroke-width:3;stroke-linejoin:round;stroke-dasharray:6 4}
+.grid .gline{fill:none;stroke:var(--red);stroke-width:3;stroke-linecap:round}
+.grid .hyp{fill:none;stroke:var(--red);stroke-width:3;stroke-linecap:round}
+.nline{width:100%;max-width:600px;height:auto;display:block;margin:4px auto}
+.nline .nl,.nline .tk{stroke:var(--ink);stroke-width:2}
+.nline .tl{font-size:14px;fill:var(--text);font-family:"BIZ UDPGothic",sans-serif}.nline .tl.b{font-weight:700;fill:var(--red)}
+.nline .shade{stroke:var(--red);stroke-width:7;stroke-linecap:round;opacity:.75;fill:none}
+.nline .mk{cursor:pointer}
+.nline .mk circle{stroke:var(--ink);stroke-width:3;fill:var(--card)}
+.nline .mk.unset circle{stroke:var(--red);stroke-dasharray:4 3}
+.nline .mk.in circle{fill:var(--ink)}
+.opt.on{border-color:var(--red);background:var(--marker)}
+.ineq,.tmpl{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;font-family:"Klee One",serif;font-size:28px;color:var(--ink);margin:10px 0}
+.ops{min-width:52px;min-height:48px;border:2px dashed var(--red);border-radius:8px;background:var(--card);color:var(--red);font-family:"Klee One",serif;font-size:26px;cursor:pointer}
+.ops.wide{min-width:80px}
+.ops.f{border-style:solid;border-color:var(--ink);color:var(--ink)}
+.eqbig{font-family:"Klee One",serif;font-size:32px;color:var(--ok);text-align:center;margin:8px 0;font-weight:600}
+.inrow input.sm{width:3.6em}
+.mach{display:grid;grid-template-columns:1fr 1.6fr 1fr;align-items:center;gap:8px;margin:10px 0;text-align:center}
+.mio{border:2px dashed var(--ink);border-radius:10px;padding:10px 4px;font-family:"Times New Roman",serif;font-style:italic;font-size:26px;color:var(--ink)}
+.mio small{display:block;font-family:"BIZ UDPGothic",sans-serif;font-style:normal;font-size:12px;color:var(--muted)}
+.mbody{background:var(--ink);color:var(--paper);border-radius:14px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.gear{width:46px;height:46px}.gear path{fill:var(--marker)}
+.mlog .lg{font-family:"Klee One",serif;font-size:20px;color:var(--ink)}.mlog .lg.many{color:var(--red)}
+.tblw{overflow-x:auto;margin:8px 0 22px;padding:16px 0}
+.vt{border-collapse:collapse;margin:0 auto;font-family:"Klee One",serif;font-size:20px;color:var(--ink)}
+.vt th,.vt td{border:1px solid var(--line);padding:4px 10px;text-align:center;min-width:52px;background:var(--card)}
+.vt th{background:var(--chip);font-family:"BIZ UDPGothic",sans-serif;font-size:15px}
+.vt td.okc{color:var(--ok);font-weight:600}
+.vt input.cell{width:3.6em;font-family:"Klee One",serif;font-size:18px;border:2px solid var(--ink);border-radius:4px;padding:1px 4px;background:var(--card);color:var(--ink)}
+.fxtok.tagk{font-size:18px;background:var(--marker);border-radius:10px;padding:0 8px;color:var(--ink)}
+.tag2{display:inline-block;font-weight:700;color:var(--paper);background:var(--ok);border-radius:14px;padding:2px 14px;margin:0}
+.opt.big2{font-size:22px;padding:10px 26px;font-family:"BIZ UDPGothic",sans-serif;font-weight:700}
+
+/* 1つにまとめた版・苦手つぶし */
+.weakcard{border:2px solid var(--red);border-radius:10px;background:var(--card);padding:12px 14px;margin:6px 0 18px}
+.wkhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}.wkhead h3{margin:0;color:var(--red)}
+.wkrow{display:grid;grid-template-columns:minmax(120px,1fr) 2fr auto;gap:10px;align-items:center;padding:8px 0;border-top:1px dotted var(--line)}
+@media (max-width:560px){.wkrow{grid-template-columns:1fr auto}.wkblocks{grid-column:1/-1;order:3}}
+.wkname b{display:block;font-size:15px;color:var(--ink)}.wkname span{font-size:12px}
+.wkblocks{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.blk{width:30px;height:30px}.blk.big{width:62px;height:62px}
+.blk .bk{fill:var(--ink)}.blk .bk2{fill:none;stroke:var(--paper);stroke-opacity:.25;stroke-width:2}
+.blk .crack{fill:none;stroke:var(--red);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.blk .gold{fill:var(--gold)}.blk .gtx{font-size:15px;font-weight:700;fill:var(--card);font-family:"BIZ UDPGothic",sans-serif}
+.chtabs{display:flex;gap:8px;margin:0 0 8px}
+.chtabs button{flex:1;border:2px solid var(--line);background:var(--chip);border-radius:10px;padding:8px;font-weight:700;color:var(--muted);cursor:pointer;font-size:16px}
+.chtabs button small{display:block;font-weight:400;font-size:12px}
+.chtabs button.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.wall{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0;padding:12px;border-radius:10px;background:var(--chip);border:1px solid var(--line)}
+.wb{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px;border-radius:8px}
+.wb.tg{outline:3px solid var(--red);background:var(--card)}
+.need{display:flex;gap:3px;min-height:10px}.need .nd{display:block;width:10px;height:10px;border-radius:50%;border:2px solid var(--ok)}
+details.card summary{cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+/* ===== 保存 ===== */
+const KEY='math-work-support-v1';
+let S={st:{},sound:true,miss:{}};
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r));}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}};
+const stS=id=>(S.st[id]=S.st[id]||{point:false,done:{},paper:{}});
+
+/* ===== 音 ===== */
+let AC=null;
+function ac(){if(!S.sound)return null;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();return AC;}catch(e){return null;}}
+function tone(seq){const a=ac();if(!a)return;let t=a.currentTime;
+  seq.forEach(([f,d,type,f2])=>{const o=a.createOscillator(),g=a.createGain();o.type=type||'triangle';o.frequency.setValueAtTime(f,t);
+    if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(.18,t);g.gain.exponentialRampToValueAtTime(.001,t+d);
+    o.connect(g).connect(a.destination);o.start(t);o.stop(t+d);t+=d*.8;});}
+function noise(d,hp,vol){const a=ac();if(!a)return;const b=a.createBuffer(1,a.sampleRate*d,a.sampleRate),ch=b.getChannelData(0);
+  for(let i=0;i<ch.length;i++)ch[i]=(Math.random()*2-1)*(1-i/ch.length)**2;
+  const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=b;f.type='highpass';f.frequency.value=hp;g.gain.value=vol;
+  s.connect(f).connect(g).connect(a.destination);s.start();}
+const fx={
+  ok:()=>tone([[880,.1],[1320,.18]]),
+  ng:()=>tone([[150,.25,'square']]),
+  swoosh:()=>tone([[300,.18,'sine',1400]]),
+  bang:()=>{noise(.18,800,.6);tone([[90,.12,'square',40]]);},
+  stamp:()=>{noise(.08,200,.5);tone([[120,.15,'sine',60]]);},
+  clear:()=>tone([[660,.1],[880,.1],[1100,.1],[1320,.35]]),
+  hit:()=>{noise(.3,300,.8);tone([[200,.3,'sawtooth',50]]);},
+  win:()=>tone([[523,.12],[659,.12],[784,.12],[1047,.2],[784,.12],[1047,.5]])
+};
+
+/* ===== アニメーション ===== */
+const RM=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+const fxl=document.createElement('div');fxl.id='fx';fxl.setAttribute('aria-hidden','true');document.body.appendChild(fxl);
+const cv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const ctr=r=>({x:r.left+r.width/2,y:r.top+r.height/2});
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const C0='translate(-50%,-50%)';
+function fxel(html,cls,x,y){const d=document.createElement('div');d.className=cls;d.innerHTML=html;d.style.left=x+'px';d.style.top=y+'px';fxl.appendChild(d);return d;}
+// 項や数が弧をえがいて飛ぶ
+function shot(fromR,toR,html,cls='fxtok',dur=320){
+  if(RM||!fromR||!toR)return Promise.resolve();
+  const a=ctr(fromR),b=ctr(toR),dx=b.x-a.x,dy=b.y-a.y,d=fxel(html,cls,a.x,a.y);
+  return d.animate([{transform:`${C0} scale(1)`},{transform:`${C0} translate(${dx/2}px,${dy/2-50}px) scale(1.25)`},{transform:`${C0} translate(${dx}px,${dy}px) scale(.9)`}],
+    {duration:dur,easing:'ease-in'}).finished.then(()=>d.remove());
+}
+// はじける粒
+function burst(x,y,color,n=10,dist=46){
+  if(RM)return;color=color||cv('--red');
+  for(let i=0;i<n;i++){const a=Math.PI*2*i/n+Math.random()*.4,r=dist*(.7+Math.random()*.6);
+    const d=fxel('','fxp dotp',x,y);d.style.background=color;
+    d.animate([{transform:`${C0} scale(1)`,opacity:1},{transform:`${C0} translate(${Math.cos(a)*r}px,${Math.sin(a)*r}px) scale(.3)`,opacity:0}],{duration:480,easing:'ease-out'}).finished.then(()=>d.remove());}
+  const ring=fxel('','fxp ringp',x,y);ring.style.borderColor=color;
+  ring.animate([{transform:`${C0} scale(.2)`,opacity:.9},{transform:`${C0} scale(1.6)`,opacity:0}],{duration:450,easing:'ease-out'}).finished.then(()=>ring.remove());
+}
+// 文字がふわっと上がって消える
+function floatText(x,y,text,color){
+  if(RM)return;const d=fxel(text,'fxtok',x,y);d.style.color=color||cv('--red');d.style.fontSize='28px';
+  d.animate([{transform:`${C0} scale(.6)`,opacity:0},{transform:`${C0} translate(0,-20px) scale(1.2)`,opacity:1,offset:.25},{transform:`${C0} translate(0,-60px)`,opacity:0}],{duration:1000,easing:'ease-out'}).finished.then(()=>d.remove());
+}
+// 紙ふぶき
+function confetti(n=70){
+  if(RM)return;const cols=[cv('--red'),cv('--ok'),cv('--ink'),cv('--gold'),'#5aa9e6'];const W=innerWidth,H=innerHeight;
+  for(let i=0;i<n;i++){const d=fxel('','fxp conf',Math.random()*W,-20);d.style.background=cols[i%cols.length];
+    const dx=(Math.random()-.5)*160,rot=(Math.random()*720-360),dur=1400+Math.random()*1200;
+    d.animate([{transform:`translate(0,0) rotate(0deg)`},{transform:`translate(${dx}px,${H+40}px) rotate(${rot}deg)`}],{duration:dur,delay:Math.random()*300,easing:'cubic-bezier(.25,.6,.5,1)',fill:'backwards'}).finished.then(()=>d.remove());}
+}
+// ぶるっとふるえる
+function shake(el){if(RM||!el)return;el.animate([{transform:'translateX(0)'},{transform:'translateX(-9px)'},{transform:'translateX(8px)'},{transform:'translateX(-5px)'},{transform:'translateX(3px)'},{transform:'translateX(0)'}],{duration:420});}
+// 大きな文字のバナー
+function banner(text,color){
+  const d=fxel(text,'banner',innerWidth/2,innerHeight*.4);d.style.color=color||cv('--red');
+  if(RM){setTimeout(()=>d.remove(),1500);return;}
+  d.animate([{transform:`${C0} scale(.2) rotate(-12deg)`,opacity:0},{transform:`${C0} scale(1.15) rotate(3deg)`,opacity:1,offset:.25},{transform:`${C0} scale(1) rotate(0)`,opacity:1,offset:.4},{transform:`${C0} scale(1)`,opacity:1,offset:.8},{transform:`${C0} translate(0,-30px) scale(.9)`,opacity:0}],{duration:2200,easing:'ease-out'}).finished.then(()=>d.remove());
+}
+// ボスがバラバラにくだける
+function explode(el){
+  if(RM||!el)return;const r=el.getBoundingClientRect(),c=ctr(r);const cols=[cv('--ink'),cv('--red')];
+  for(let i=0;i<24;i++){const d=fxel('','fxp chunk',c.x+(Math.random()-.5)*r.width*.8,c.y+(Math.random()-.5)*r.height*.8);d.style.background=cols[i%2];
+    const a=Math.random()*Math.PI*2,dist=80+Math.random()*120;
+    d.animate([{transform:`${C0}`,opacity:1},{transform:`${C0} translate(${Math.cos(a)*dist}px,${Math.sin(a)*dist+60}px) rotate(${Math.random()*540}deg)`,opacity:0}],{duration:900,easing:'cubic-bezier(.2,.7,.4,1)'}).finished.then(()=>d.remove());}
+  el.animate([{opacity:1,transform:'scale(1)'},{opacity:0,transform:'scale(1.4)'}],{duration:300,fill:'forwards'});
+}
+// ×の数のスタンプが落ちてくる
+function stampDrop(el,label){
+  if(RM||!el)return Promise.resolve();const c=ctr(el.getBoundingClientRect());const d=fxel(label,'fxtok stampk',c.x,c.y-6);
+  const a=d.animate([{transform:`${C0} translate(0,-50px) scale(2.6) rotate(-20deg)`,opacity:0},{transform:`${C0} scale(1) rotate(-8deg)`,opacity:1}],{duration:230,easing:'ease-in'});
+  return a.finished.then(()=>{burst(c.x,c.y,cv('--red'),8,34);d.animate([{opacity:1},{opacity:0,transform:`${C0} scale(1.2) rotate(-8deg)`}],{duration:260}).finished.then(()=>d.remove());});
+}
+// 図が線から順にかかれていく
+function drawIn(svg){
+  if(RM||!svg)return;let k=0;
+  svg.querySelectorAll(':scope > rect, :scope > line').forEach(e=>{e.style.transformBox='fill-box';e.style.transformOrigin='left center';
+    e.animate([{transform:'scaleX(0)',opacity:.3},{transform:'scaleX(1)',opacity:1}],{duration:420,delay:k++*70,easing:'ease-out',fill:'backwards'});});
+  svg.querySelectorAll(':scope > text').forEach(e=>e.animate([{opacity:0},{opacity:1}],{duration:300,delay:k*70+100,fill:'backwards'}));
+  svg.querySelectorAll('.slot').forEach((g,i)=>{g.style.transformBox='fill-box';g.style.transformOrigin='center';
+    g.animate([{transform:'scale(0)',opacity:0},{transform:'scale(1)',opacity:1}],{duration:380,delay:k*70+250+i*130,easing:'cubic-bezier(.34,1.56,.64,1)',fill:'backwards'});});
+}
+const RUNNER=`<svg viewBox="0 0 40 46" width="40" height="46"><path d="M12 9 L20 0 L28 9 Z" fill="var(--red)"/><rect x="6" y="8" width="28" height="28" rx="8" fill="var(--ink)"/><circle cx="15" cy="20" r="4" fill="var(--paper)"/><circle cx="25" cy="20" r="4" fill="var(--paper)"/><circle cx="16" cy="21" r="2" fill="var(--ink)"/><circle cx="26" cy="21" r="2" fill="var(--ink)"/><path d="M15 28 Q20 32 25 28" stroke="var(--paper)" stroke-width="2" fill="none" stroke-linecap="round"/><rect x="10" y="36" width="6" height="8" rx="3" fill="var(--ink)"/><rect x="24" y="36" width="6" height="8" rx="3" fill="var(--ink)"/></svg>`;
+
+/* ===== 分数 ===== */
+const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b)[a,b]=[b,a%b];return a;};
+const lcm=(a,b)=>a/gcd(a,b)*b;
+function F(n,d=1){if(d<0){n=-n;d=-d;}const g=gcd(n,d)||1;return{n:n/g,d:d/g};}
+const fadd=(a,b)=>F(a.n*b.d+b.n*a.d,a.d*b.d),fmul=(a,b)=>F(a.n*b.n,a.d*b.d),fdiv=(a,b)=>F(a.n*b.d,a.d*b.n),fneg=a=>F(-a.n,a.d);
+const fint=a=>a.d===1,feq=(a,b)=>a.n===b.n&&a.d===b.d,fone=a=>a.n===1&&a.d===1;
+const decable=d=>{while(d%2===0)d/=2;while(d%5===0)d/=5;return d===1;};
+function parseF(s){s=String(s).normalize('NFKC').replace(/[−ー－‐―]/g,'-').replace(/\s/g,'');
+  let m=s.match(/^(-?)(\d+)\/(\d+)$/);if(m&&+m[3])return F((m[1]?-1:1)*m[2],+m[3]);
+  m=s.match(/^(-?)(\d+)(?:\.(\d+))?$/);if(m){const f=m[3]||'';return F((m[1]?-1:1)*parseInt(m[2]+f),10**f.length);}
+  return null;}
+
+/* ===== 式：パーサー ===== */
+let uid=0;
+const TM=(c,x,dec)=>({t:'n',c,x:x?1:0,dec:!!dec,id:++uid});
+const GP=(k,items,dec)=>({t:'g',k,items,dec:!!dec,id:++uid});
+function parseSide(src){
+  const s=src.replace(/\s/g,'').replace(/[−–]/g,'-');let i=0;const out=[];
+  const rn=()=>{const m=s.slice(i).match(/^\d+(\.\d+)?/);if(!m)return null;i+=m[0].length;return m[0];};
+  const toF=str=>{if(str.includes('.')){const[a,b]=str.split('.');return F(parseInt(a+b),10**b.length);}return F(parseInt(str));};
+  while(i<s.length){
+    let sign=1;while(s[i]==='+'||s[i]==='-'){if(s[i]==='-')sign=-sign;i++;}
+    let c=F(sign),dec=false,had=false;const ns=rn();
+    if(ns){had=true;dec=ns.includes('.');c=fmul(c,toF(ns));if(s[i]==='/'&&/\d/.test(s[i+1])){i++;c=fdiv(c,F(parseInt(rn())));}}
+    if(s[i]==='('){let dp=1,j=i+1;while(dp){if(s[j]==='(')dp++;if(s[j]===')')dp--;j++;}
+      const inner=parseSide(s.slice(i+1,j-1));i=j;if(s[i]==='/'){i++;c=fdiv(c,F(parseInt(rn())));}
+      out.push(GP(c,inner,dec));}
+    else if(s[i]==='x'){i++;if(s[i]==='/'){i++;c=fdiv(c,F(parseInt(rn())));}out.push(TM(c,1,dec));}
+    else{if(!had)throw new Error('parse '+src);out.push(TM(c,0,dec));}
+  }
+  return out;
+}
+const unwrap=l=>(l.length===1&&l[0].t==='g'&&fone(l[0].k))?l[0].items:l;
+function lin(items){let a=F(0),b=F(0);items.forEach(t=>{if(t.t==='n'){if(t.x)a=fadd(a,t.c);else b=fadd(b,t.c);}
+  else{const r=lin(t.items);a=fadd(a,fmul(t.k,r.a));b=fadd(b,fmul(t.k,r.b));}});return{a,b};}
+function solve(L,R){const l=lin(L),r=lin(R);return fdiv(fadd(r.b,fneg(l.b)),fadd(l.a,fneg(r.a)));}
+const fStr=f=>f.d===1?String(f.n):f.n+'/'+f.d;
+function mulParts(A,B){
+  const isC=l=>l.length===1&&l[0].t==='n'&&!l[0].x;
+  if(isC(A)&&isC(B))return[TM(fmul(A[0].c,B[0].c),0,A[0].dec||B[0].dec)];
+  let k,E;if(isC(A)){k=A[0];E=B;}else{k=B[0];E=A;}
+  if(E.length===1&&E[0].t==='n')return[TM(fmul(k.c,E[0].c),E[0].x,k.dec||E[0].dec)];
+  return[GP(k.c,JSON.parse(JSON.stringify(E)),k.dec)];
+}
+
+/* ===== 式：表示 ===== */
+const X='<i>x</i>';
+const fr=(a,b)=>`<span class="fr"><span class="n">${a}</span><span class="d">${b}</span></span>`;
+function numH(c,dec){c=F(Math.abs(c.n),c.d);if(c.d===1)return String(c.n);
+  if(dec&&decable(c.d))return String(+(c.n/c.d).toFixed(6));return fr(c.n,c.d);}
+function termAbs(t){const c=F(Math.abs(t.c.n),t.c.d);if(!t.x)return numH(c,t.dec);
+  if(fone(c))return X;if(c.d===1||(t.dec&&decable(c.d)))return numH(c,t.dec)+X;if(c.n===1)return fr(X,c.d);return fr(c.n,c.d)+X;}
+const isNeg=it=>(it.t==='n'?it.c.n:it.k.n)<0;
+const innerH=items=>items.map((t,j)=>(isNeg(t)?(j?' − ':'−'):(j?' + ':''))+termAbs(t)).join('');
+function grpAbs(g){const k=F(Math.abs(g.k.n),g.k.d),inn=innerH(g.items);
+  if(fone(k))return'('+inn+')';if(k.d===1||(g.dec&&decable(k.d)))return numH(k,g.dec)+'('+inn+')';
+  if(k.n===1)return fr(inn,k.d);return fr(k.n,k.d)+'('+inn+')';}
+const itemAbs=it=>it.t==='n'?termAbs(it):grpAbs(it);
+function grpAbsW(g,dj=-1){const k=F(Math.abs(g.k.n),g.k.d);
+  const inn=g.items.map((t,j)=>`<span class="gin ${j<dj?'done':''}" data-j="${j}">${(isNeg(t)?(j?' − ':'−'):(j?' + ':''))+termAbs(t)}</span>`).join('');
+  if(fone(k))return'<span class="gk">(</span>'+inn+')';if(k.d===1||(g.dec&&decable(k.d)))return'<span class="gk">'+numH(k,g.dec)+'</span>('+inn+')';
+  if(k.n===1)return fr(inn,k.d);return fr(k.n,k.d)+'('+inn+')';}
+function sideH(items){if(!items.length)return'0';return items.map((t,j)=>(isNeg(t)?(j?' − ':'−'):(j?' + ':''))+itemAbs(t)).join('');}
+function exprH(s){try{return exprH0(s);}catch(e){return md(s.replace(/-/g,'−'));}}
+function exprH0(s){
+  if(s.includes(':'))return s.split('=').map(h=>h.split(':').map(p=>{const l=parseSide(p);return(l.length===1&&l[0].t==='g'&&fone(l[0].k))?'('+innerH(l[0].items)+')':sideH(l);}).join(' : ')).join(' = ');
+  return s.split('=').map(h=>sideH(parseSide(h))).join(' = ');}
+// 説明文用：[a|b] を分数、x を斜体に
+function md(s){let h=s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/(^|[^a-zA-Z])([xya])(?![a-zA-Z])/g,'$1<i>$2</i>');
+  return h.replace(/\[([^\[\]|]+)\|([^\[\]|]+)\]/g,(m,a,b)=>fr(a,b));}
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const cp=o=>JSON.parse(JSON.stringify(o));
+
+/* ===== 答えの判定 ===== */
+function judge(input,expect){
+  const s=String(input).normalize('NFKC').replace(/[−ー－‐―]/g,'-').replace(/\s/g,'').replace(/^[xa]=/i,'');
+  const t=parseF(s),e=parseF(expect);
+  if(!t)return{ok:false,msg:'数で入力してね（例：-3、9/2）'};
+  if(!feq(t,e))return{ok:false,msg:'ちがうよ。もう一度計算しよう。'};
+  const m=s.match(/^-?(\d+)\/(\d+)$/);
+  if(e.d!==1&&!m)return{ok:false,msg:'値は合っている。テストでは分数で書こう。'};
+  if(m&&gcd(+m[1],+m[2])>1)return{ok:false,msg:'値は合っている。約分しよう。'};
+  if(m&&+m[2]===1)return{ok:false,msg:'分母が1なら整数で書こう。'};
+  return{ok:true};
+}
+const ansH=f=>(f.n<0?'−':'')+(f.d===1?Math.abs(f.n):fr(Math.abs(f.n),f.d));
+
+/* ===== 共通の表示 ===== */
+const fH=f=>(f.n<0?'−':'')+(f.d===1?Math.abs(f.n):fr(Math.abs(f.n),f.d));
+const fHp=f=>f.n<0?'('+fH(f)+')':fH(f);
+const fS=f=>f.d===1?String(f.n):f.n+'/'+f.d;
+const PF=s=>parseF(String(s));
+const fv=f=>f.n/f.d;
+const IX='<i>x</i>',IY='<i>y</i>';
+function eqHi(a){if(fone(a))return`${IY} = ${IX}`;if(a.n===-1&&a.d===1)return`${IY} = −${IX}`;
+  return`${IY} = ${a.n<0?'−':''}${a.d===1?Math.abs(a.n):fr(Math.abs(a.n),a.d)}${IX}`;}
+const eqHan=a=>`${IY} = ${a.n<0?'−':''}${fr(Math.abs(a.n),IX)}`;
+function animNew(root){
+  if(RM)return;
+  root.querySelectorAll('[data-new]').forEach(e=>{const dl=+(e.dataset.delay||0);
+    if(e.tagName==='path'||e.tagName==='line'){const L=e.getTotalLength?e.getTotalLength():300;e.style.strokeDasharray=L+' '+L;
+      e.animate([{strokeDashoffset:L},{strokeDashoffset:0}],{duration:+(e.dataset.dur||800),delay:dl,easing:'ease-out',fill:'backwards'}).finished.then(()=>{e.style.strokeDasharray='';});}
+    else{e.style.transformBox='fill-box';e.style.transformOrigin='center';
+      e.animate([{transform:'scale(0)',opacity:0},{transform:'scale(1.7)',opacity:1,offset:.55},{transform:'scale(1)'}],{duration:480,delay:dl,easing:'ease-out',fill:'backwards'});}});
+}
+function clearHTML(t){return`<div class="clearbox pop"><b>クリア！</b>${t?`<div>${t}</div>`:''}</div>`;}
+function inputBind(el,sel,go){const i=el.querySelector(sel);if(!i)return;i.focus({preventScroll:true});i.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();go();}};}
+const NOTE_FR='分数は 3/4 のように、マイナスは -3 のように打ちこもう';
+
+/* ===== 座標平面 ===== */
+function grid(min,max,u){
+  const pad=28,W=(max-min)*u+pad*2,X=v=>pad+(v-min)*u,Y=v=>pad+(max-v)*u;
+  let s=`<svg class="grid" viewBox="0 0 ${W} ${W}" role="img" aria-label="座標平面">`;
+  for(let i=min;i<=max;i++)s+=`<line class="gl" x1="${X(i)}" y1="${Y(min)}" x2="${X(i)}" y2="${Y(max)}"/><line class="gl" x1="${X(min)}" y1="${Y(i)}" x2="${X(max)}" y2="${Y(i)}"/>`;
+  s+=`<line class="ax" x1="${X(min)}" y1="${Y(0)}" x2="${X(max)+12}" y2="${Y(0)}"/><line class="ax" x1="${X(0)}" y1="${Y(min)}" x2="${X(0)}" y2="${Y(max)-12}"/>`;
+  s+=`<text class="gt it" x="${X(max)+12}" y="${Y(0)+18}">x</text><text class="gt it" x="${X(0)+8}" y="${Y(max)-6}">y</text><text class="gt" x="${X(0)-14}" y="${Y(0)+17}">O</text>`;
+  const st=max>=10?5:5;[st,-st].forEach(v=>{if(v<=max&&v>=min){s+=`<text class="gt" x="${X(v)}" y="${Y(0)+17}" text-anchor="middle">${v<0?'−'+(-v):v}</text><text class="gt" x="${X(0)-8}" y="${Y(v)+5}" text-anchor="end">${v<0?'−'+(-v):v}</text>`;}});
+  return{min,max,u,W,X,Y,s};
+}
+const latH=G=>{let s='<g class="lat">';for(let x=G.min;x<=G.max;x++)for(let y=G.min;y<=G.max;y++)s+=`<circle class="lp" cx="${G.X(x)}" cy="${G.Y(y)}" r="${G.u*.45}" data-gx="${x}" data-gy="${y}"/>`;return s+'</g>';};
+const ptH=(G,x,y,lab,cls,nw,dl)=>`<g class="pt ${cls||''}" ${nw?`data-new="1" data-delay="${dl||0}"`:''}><circle cx="${G.X(x)}" cy="${G.Y(y)}" r="6"/>${lab?`<text x="${G.X(x)+8}" y="${G.Y(y)-9}">${lab}</text>`:''}</g>`;
+const walkH=(G,x,y,nw)=>`<path class="walk" ${nw?'data-new="1" data-dur="650"':''} d="M${G.X(0)} ${G.Y(0)} L${G.X(x)} ${G.Y(0)} L${G.X(x)} ${G.Y(y)}"/>`;
+function lineH(G,a,nw,cls='gline'){const v=fv(a);let xe=G.max;if(Math.abs(v*xe)>G.max)xe=G.max/Math.abs(v);
+  const n=nw?'data-new="1" data-dur="900" data-delay="'+(nw===2?500:0)+'"':'';
+  return`<path class="${cls}" ${n} d="M${G.X(0)} ${G.Y(0)} L${G.X(xe)} ${G.Y(v*xe)}"/><path class="${cls}" ${n} d="M${G.X(0)} ${G.Y(0)} L${G.X(-xe)} ${G.Y(-v*xe)}"/>`;}
+function hypH(G,a,nw){const x0=Math.abs(a)/G.max,N=90;let d1='',d2='';
+  for(let i=0;i<=N;i++){const x=x0*Math.pow(G.max/x0,i/N),y=a/x;d1+=(i?'L':'M')+G.X(x).toFixed(1)+' '+G.Y(y).toFixed(1);d2+=(i?'L':'M')+G.X(-x).toFixed(1)+' '+G.Y(-y).toFixed(1);}
+  const n=nw?'data-new="1" data-dur="1300"':'';return`<path class="hyp" ${n} d="${d1}"/><path class="hyp" ${n} d="${d2}"/>`;}
+
+/* ===== 1 変域（数直線と不等号） ===== */
+class Ineq{
+  constructor(el,d,o){this.el=el;this.d=d;this.o=o;this.ph=0;this.ends={};this.dir=null;this.ops=[];this.msg='';this.mc='';this.newShade=false;
+    const two=d.lo!=null;this.two=two;const a=two?d.lo:d.v,b=two?d.hi:d.v,sp=b-a;
+    this.step=sp<=10?1:sp<=24?2:sp<=60?5:10;this.from=Math.floor(a/this.step)*this.step-(two?2:5)*this.step;this.to=Math.ceil(b/this.step)*this.step+(two?2:5)*this.step;
+    this.render();}
+  P(v){return 30+(v-this.from)/(this.to-this.from)*540;}
+  want(){const d=this.d;return this.two?{lo:d.loI?'in':'out',hi:d.hiI?'in':'out'}:{v:d.vI?'in':'out'};}
+  ansOps(){const d=this.d;if(this.two)return[d.loI?'≦':'<',d.hiI?'≦':'<'];return[d.dir==='R'?(d.vI?'≧':'>'):(d.vI?'≦':'<')];}
+  lineSVG(){
+    let s=`<svg class="nline" viewBox="0 0 600 96" role="img" aria-label="数直線"><line class="nl" x1="20" y1="50" x2="584" y2="50"/><path class="nl" d="M584 50 l-10 -6 v12 z" style="fill:var(--ink)"/>`;
+    const many=(this.to-this.from)/this.step>14;let k=0;
+    for(let v=this.from;v<=this.to;v+=this.step){const x=this.P(v);s+=`<line class="tk" x1="${x}" y1="43" x2="${x}" y2="57"/>`;
+      if(!many||k%2===0||v===0)s+=`<text class="tl" x="${x}" y="80" text-anchor="middle">${v<0?'−'+(-v):v}</text>`;k++;}
+    if(this.ph>=1){const nw=this.newShade?'data-new="1" data-dur="700"':'';
+      if(this.two)s+=`<path class="shade" ${nw} d="M${this.P(this.d.lo)} 50 L${this.P(this.d.hi)} 50"/>`;
+      else{const e=this.d.dir==='R'?586:14;s+=`<path class="shade" ${nw} d="M${this.P(this.d.v)} 50 L${e} 50"/>`;}}
+    const ends=this.two?[['lo',this.d.lo],['hi',this.d.hi]]:[['v',this.d.v]];
+    ends.forEach(([k,v])=>{const st=this.ends[k];s+=`<g class="mk ${st||'unset'}" data-end="${k}" tabindex="0"><circle cx="${this.P(v)}" cy="50" r="10"/><text class="tl b" x="${this.P(v)}" y="28" text-anchor="middle">${v<0?'−'+(-v):v}</text></g>`;});
+    return s+'</svg>';
+  }
+  render(){
+    let h=`<p class="big">${IX} が <b>${this.d.t}</b></p>${this.lineSVG()}`;
+    if(this.ph===0){
+      h+=`<p class="muted" style="margin:0">はしの点をタップして <b>●</b>（その数をふくむ）か <b>○</b>（ふくまない）にしよう。</p>`;
+      if(!this.two)h+=`<div class="opts"><button class="opt txt ${this.dir==='L'?'on':''}" data-dir="L">← 左側（小さい方）</button><button class="opt txt ${this.dir==='R'?'on':''}" data-dir="R">右側（大きい方）→</button></div>`;
+      h+=`<p><button class="btn" data-a="chk">数直線をチェック</button></p>`;
+    }else if(this.ph===1){
+      const sl=i=>`<button class="ops ${this.ops[i]?'f':''}" data-sl="${i}">${this.ops[i]||'？'}</button>`;
+      h+=`<p class="muted" style="margin:6px 0 0">不等号をえらんで、式にしよう。</p><div class="ineq">${this.two?`<span>${fH(F(this.d.lo))}</span>${sl(0)}${IX}${sl(1)}<span>${fH(F(this.d.hi))}</span>`:`${IX}${sl(0)}<span>${fH(F(this.d.v))}</span>`}</div>
+        <div class="pool">${['≦','<','≧','>'].map(o=>`<button class="pc" data-op="${o}">${o}</button>`).join('')}</div>`;
+    }else h+=clearHTML(`<span class="eqt">${this.two?fH(F(this.d.lo))+' '+this.ops[0]+' '+IX+' '+this.ops[1]+' '+fH(F(this.d.hi)):IX+' '+this.ops[0]+' '+fH(F(this.d.v))}</span>`);
+    h+=`<div class="fb ${this.mc}" aria-live="polite">${this.msg}</div>`;
+    this.el.innerHTML=h;this.newShade=false;animNew(this.el);this.bind();
+    if(this.pend){const p=this.pend;this.pend=null;if(p.shake)shake(this.el.querySelector(p.shake));if(p.conf)confetti();}
+  }
+  bind(){
+    this.el.querySelectorAll('[data-end]').forEach(g=>{const f=()=>{if(this.ph)return;const k=g.dataset.end;this.ends[k]=this.ends[k]==='in'?'out':'in';fx.stamp();this.render();
+      const c=this.el.querySelector(`[data-end="${k}"] circle`);if(c&&!RM){c.style.transformBox='fill-box';c.style.transformOrigin='center';c.animate([{transform:'scale(1.8)'},{transform:'scale(1)'}],{duration:300,easing:'ease-out'});}};
+      g.onclick=f;g.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')f();};});
+    this.el.querySelectorAll('[data-dir]').forEach(b=>b.onclick=()=>{this.dir=b.dataset.dir;fx.ok();this.render();});
+    const c=this.el.querySelector('[data-a="chk"]');if(c)c.onclick=()=>this.check();
+    this.el.querySelectorAll('[data-op]').forEach(b=>b.onclick=()=>this.pickOp(b));
+    this.el.querySelectorAll('[data-sl]').forEach(b=>b.onclick=()=>{this.ops[+b.dataset.sl]=null;this.render();});
+  }
+  check(){
+    const w=this.want(),keys=Object.keys(w);
+    if(keys.some(k=>!this.ends[k])){this.msg='はしの点をタップして ● か ○ を決めよう。';this.mc='ng';fx.ng();this.pend={shake:'.nline'};this.render();return;}
+    if(!this.two&&!this.dir){this.msg='左側か右側か、えらぼう。';this.mc='ng';fx.ng();this.render();return;}
+    if(keys.some(k=>this.ends[k]!==w[k])){this.msg='「以上」「以下」は ●（その数もふくむ）。「未満」「より大きい」「より小さい」は ○（ふくまない）。';this.mc='ng';
+      this.o.onMiss&&this.o.onMiss('変域');fx.ng();this.pend={shake:'.nline'};this.render();return;}
+    if(!this.two&&this.dir!==this.d.dir){this.msg='「より大きい」「以上」は右側、「より小さい」「未満」「以下」は左側。';this.mc='ng';this.o.onMiss&&this.o.onMiss('変域');fx.ng();this.pend={shake:'.nline'};this.render();return;}
+    this.ph=1;this.newShade=true;this.msg='数直線OK！';this.mc='ok';fx.clear();this.render();
+  }
+  async pickOp(b){
+    const i=this.two?(this.ops[0]?1:0):0;if(this.ops[i]&&(!this.two||this.ops[1]))return;
+    const tg=this.el.querySelector(`[data-sl="${i}"]`);await shot(b.getBoundingClientRect(),tg.getBoundingClientRect(),b.dataset.op,'fxtok',260);
+    this.ops[i]=b.dataset.op;fx.ok();
+    const need=this.two?2:1;if(this.ops.filter(Boolean).length<need){this.render();return;}
+    const ans=this.ansOps();
+    if(ans.every((a,k)=>a===this.ops[k])){this.ph=2;fx.win();this.msg='';this.pend={conf:1};this.render();this.o.onClear&&setTimeout(()=>this.o.onClear(),1100);}
+    else{this.ops=[];this.msg='●（ふくむ）は ≦ や ≧、○（ふくまない）は < や >。数直線とくらべよう。';this.mc='ng';fx.ng();this.o.onMiss&&this.o.onMiss('変域');this.pend={shake:'.ineq'};this.render();}
+  }
+}
+
+/* ===== 2 関数マシン ===== */
+class Func{
+  constructor(el,d,o){this.el=el;this.d=d;this.o=o;this.k=0;this.log=[];this.msg='';this.mc='';this.done=false;this.render();}
+  render(){
+    const d=this.d;let h=`<p class="big" style="font-size:18px">${md(d.t)}</p>
+      <div class="mach"><div class="mio">${IX}<small>入れる</small></div><div class="mbody"><svg viewBox="0 0 60 60" class="gear" aria-hidden="true"><path d="M30 6l5 8 9-3 1 9 9 3-4 8 6 7-8 5 1 9-9-1-4 8-7-6-7 6-4-8-9 1 1-9-8-5 6-7-4-8 9-3 1-9 9 3z"/><circle cx="30" cy="30" r="8" style="fill:var(--card)"/></svg><b>関数マシン</b></div><div class="mio out">${IY}<small>出てくる</small></div></div>
+      <div class="mlog">${this.log.map(r=>`<div class="lg ${r.many?'many':''}">${IX}=${r.x} → ${IY}=${r.ys.join('、')}${r.many?'　<b>1つに決まらない！</b>':''}</div>`).join('')}</div>`;
+    if(this.done)h+=clearHTML(md(d.why));
+    else{h+=this.k<d.demo.length?`<p><button class="btn" data-a="run">${IX}=${d.demo[this.k][0]} を入れてみる</button></p>`:`<p class="muted">ためした。どちらかえらぼう。</p>`;
+      h+=`<div class="opts"><button class="opt txt" data-f="1">${IY} は ${IX} の関数である</button><button class="opt txt" data-f="0">関数ではない</button></div>`;}
+    h+=`<div class="fb ${this.mc}" aria-live="polite">${this.msg}</div>`;
+    this.el.innerHTML=h;
+    if(!RM)this.el.querySelectorAll('.lg.newrow').forEach(e=>e.animate([{opacity:0,transform:'translateX(-12px)'},{opacity:1,transform:'none'}],{duration:300}));
+    const r=this.el.querySelector('[data-a="run"]');if(r)r.onclick=()=>this.run(r);
+    this.el.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>this.pick(b));
+  }
+  async run(btn){
+    if(this.busy)return;this.busy=true;const [x,ys]=this.d.demo[this.k];
+    const body=this.el.querySelector('.mbody'),out=this.el.querySelector('.mio.out'),gear=this.el.querySelector('.gear');
+    await shot(btn.getBoundingClientRect(),body.getBoundingClientRect(),`${IX}=${x}`,'fxtok chipfly',420);
+    tone([[200,.4,'sawtooth',120]]);
+    if(!RM){gear.animate([{transform:'rotate(0)'},{transform:'rotate(360deg)'}],{duration:700,easing:'ease-in-out'});await body.animate([{transform:'none'},{transform:'translateY(-4px) rotate(-2deg)'},{transform:'translateY(2px) rotate(2deg)'},{transform:'none'}],{duration:350,iterations:2}).finished;}
+    const br=body.getBoundingClientRect(),or=out.getBoundingClientRect();
+    for(let i=0;i<ys.length;i++){const to={left:or.left,top:or.top+i*22-(ys.length-1)*11,width:or.width,height:or.height};
+      shot(br,to,`${IY}=${ys[i]}`,'fxtok chipfly',380);fx.ok();await wait(RM?0:200);}
+    await wait(RM?0:350);
+    this.log.push({x,ys,many:ys.length>1});this.k++;this.busy=false;this.render();
+    const last=this.el.querySelector('.mlog .lg:last-child');if(last&&!RM)last.animate([{opacity:0,transform:'translateX(-14px)'},{opacity:1,transform:'none'}],{duration:320});
+  }
+  pick(b){
+    if(!this.log.length){this.msg='まず x を入れてみよう。';this.mc='ng';fx.ng();this.render();return;}
+    if((b.dataset.f==='1')===this.d.ans){this.done=true;fx.win();this.msg='';this.render();confetti();this.o.onClear&&setTimeout(()=>this.o.onClear(),1300);}
+    else{fx.ng();shake(b);b.disabled=true;this.o.onMiss&&this.o.onMiss('関数');const fb=this.el.querySelector('.fb');fb.className='fb ng';
+      fb.textContent='x を1つ決めたとき、y が「ただ1つ」に決まるかを見よう。';}
+  }
+}
+
+/* ===== 3 式を求める（比例・反比例） ===== */
+class Find{
+  constructor(el,d,o){this.el=el;this.d=d;this.o=o;this.ph=0;this.sl=[null,null];this.sel=null;this.msg='';this.mc='';this.hint=false;
+    this.x=PF(d.x);this.y=PF(d.y);this.a=d.k==='hi'?fdiv(this.y,this.x):fmul(this.x,this.y);this.render();}
+  tokH(k){const v=k==='x'?this.x:this.y;return`${k==='x'?IX:IY} = ${fH(v)}`;}
+  render(){
+    const d=this.d,hi=d.k==='hi';
+    let h=`<p class="big">${IY} は ${IX} に<b>${hi?'比例':'反比例'}</b>し、${IX} = ${fH(this.x)} のとき ${IY} = ${fH(this.y)}</p>`;
+    const slot=i=>{const v=this.sl[i];return`<button class="ops wide ${v?'f':''}" data-s="${i}">${v?fHp(v==='x'?this.x:this.y):'？'}</button>`;};
+    h+=`<div class="tmpl">${hi?`${slot(0)} = <i>a</i> × ${slot(1)}`:`<i>a</i> = ${slot(0)} × ${slot(1)}`}</div>`;
+    if(this.ph===0){
+      h+=`<p class="muted" style="margin:0">${hi?`${IY} = <i>a</i>${IX} に代入。数をえらんで、□をタップ。`:`反比例は <i>a</i> = ${IX}${IY}。数をえらんで、□をタップ。`}</p>
+        <div class="pool">${['x','y'].map(k=>`<button class="pc ${this.sel===k?'sel':''} ${this.sl.includes(k)?'used':''}" data-t="${k}" ${this.sl.includes(k)?'disabled':''}>${this.tokH(k)}</button>`).join('')}</div>`;
+    }else if(this.ph===1){
+      h+=`<div class="inrow"><span class="eqt"><i>a</i> = </span><input id="ai" autocomplete="off" aria-label="比例定数"><button class="btn" data-a="ago">決定</button><button class="tool undo" data-a="hint">ヒント</button></div>`;
+      if(this.hint)h+=`<span class="hintline">${hi?`<i>a</i> = ${fH(this.y)} ÷ ${fHp(this.x)}`:`<i>a</i> = ${fH(this.x)} × ${fHp(this.y)}`}。わり切れなければ分数</span>`;
+      h+=`<p class="muted" style="font-size:14px">${NOTE_FR}</p>`;
+    }
+    if(this.ph>=2){h+=`<div class="eqbig" data-eq>${hi?eqHi(this.a):eqHan(this.a)}</div>`;}
+    if(this.ph===2&&d.ask){const q=d.ask;h+=`<div class="inrow"><span>${q.x!=null?`${IX} = ${fH(PF(q.x))} のとき ${IY} = `:`${IY} = ${fH(PF(q.y))} のとき ${IX} = `}</span><input id="qi" autocomplete="off" aria-label="答え"><button class="btn" data-a="qgo">決定</button></div>`;}
+    if(this.ph===3)h+=clearHTML(d.ask?'式を求めて、値まで出せた。':'式が求められた。');
+    h+=`<div class="fb ${this.mc}" aria-live="polite">${this.msg}</div>`;
+    this.el.innerHTML=h;this.bind();
+    if(this.pend){const p=this.pend;this.pend=null;if(p.shake)shake(this.el.querySelector(p.shake));if(p.eq&&!RM){const e=this.el.querySelector('[data-eq]');
+      e.animate([{transform:'scale(2.2) rotate(-6deg)',opacity:0},{transform:'scale(1) rotate(-2deg)',opacity:1,offset:.6},{transform:'none'}],{duration:520,easing:'ease-in'});setTimeout(()=>{fx.stamp();const c=ctr(e.getBoundingClientRect());burst(c.x,c.y,cv('--ok'),12,70);},300);}
+      if(p.conf)confetti();}
+  }
+  bind(){
+    const q=s=>this.el.querySelectorAll(s);
+    q('[data-t]').forEach(b=>b.onclick=()=>{this.sel=b.dataset.t;fx.ok();this.render();});
+    q('[data-s]').forEach(b=>b.onclick=()=>this.place(+b.dataset.s,b));
+    const a=this.el.querySelector('[data-a="ago"]');if(a){a.onclick=()=>this.goA();inputBind(this.el,'#ai',()=>this.goA());}
+    const hb=this.el.querySelector('[data-a="hint"]');if(hb)hb.onclick=()=>{this.hint=true;this.render();};
+    const g=this.el.querySelector('[data-a="qgo"]');if(g){g.onclick=()=>this.goQ();inputBind(this.el,'#qi',()=>this.goQ());}
+  }
+  async place(i,slotBtn){
+    if(this.ph!==0||this.sl[i])return;
+    if(!this.sel){this.msg='先に数をえらぼう。';this.mc='ng';this.render();return;}
+    const hi=this.d.k==='hi',ok=!hi||(i===0?this.sel==='y':this.sel==='x');
+    if(!ok){this.msg=`${IY} = <i>a</i> × ${IX}。左の□には ${IY}、右の□には ${IX} が入る。`;this.mc='ng';fx.ng();this.o.onMiss&&this.o.onMiss('比例の式');this.pend={shake:`[data-s="${i}"]`};this.sel=null;this.render();return;}
+    const tb=this.el.querySelector(`[data-t="${this.sel}"]`);await shot(tb.getBoundingClientRect(),slotBtn.getBoundingClientRect(),this.tokH(this.sel),'fxtok chipfly',360);
+    this.sl[i]=this.sel;this.sel=null;fx.ok();this.msg='';
+    if(this.sl[0]&&this.sl[1]){this.ph=1;this.msg='代入できた！ <i>a</i> を計算しよう。';this.mc='ok';}
+    this.render();
+  }
+  goA(){
+    const r=judge(this.el.querySelector('#ai').value,fS(this.a));
+    if(!r.ok){this.msg=r.msg.startsWith('ちがう')?(this.d.k==='hi'?'ちがうよ。<i>a</i> = '+IY+' ÷ '+IX+'。符号にも気をつけよう。':'ちがうよ。<i>a</i> = '+IX+' × '+IY+'。符号にも気をつけよう。'):r.msg;this.mc='ng';fx.ng();
+      this.o.onMiss&&this.o.onMiss(this.d.k==='hi'?'比例の式':'反比例の式');this.pend={shake:'.inrow'};this.render();return;}
+    this.ph=2;this.msg='';this.pend={eq:1};
+    if(!this.d.ask){this.ph=3;this.pend.conf=1;fx.win();this.render();this.o.onClear&&setTimeout(()=>this.o.onClear(),1300);return;}
+    this.render();
+  }
+  goQ(){
+    const q=this.d.ask,hi=this.d.k==='hi';let ans;
+    if(q.x!=null){const x=PF(q.x);ans=hi?fmul(this.a,x):fdiv(this.a,x);}else{const y=PF(q.y);ans=hi?fdiv(y,this.a):fdiv(this.a,y);}
+    const r=judge(this.el.querySelector('#qi').value,fS(ans));
+    if(!r.ok){this.msg=r.msg.startsWith('ちがう')?'ちがうよ。式に代入して計算しよう。':r.msg;this.mc='ng';fx.ng();this.o.onMiss&&this.o.onMiss('値を求める');this.pend={shake:'.inrow'};this.render();return;}
+    this.ph=3;this.msg='';fx.win();this.pend={conf:1};this.render();this.o.onClear&&setTimeout(()=>this.o.onClear(),1300);
+  }
+}
+
+/* ===== 4 座標：点をとる・読む ===== */
+class Plot{
+  constructor(el,d,o){this.el=el;this.d=d;this.o=o;this.k=0;this.placed=[];this.msg='';this.mc='';this.G=grid(-6,6,30);this.render();}
+  render(nw){
+    const G=this.G,d=this.d;let s=G.s;
+    if(d.mode==='read'){d.pts.forEach(([n,x,y],i)=>{s+=ptH(G,x,y,n,i<this.k?'ok':i===this.k?'cur':'');});if(nw)s+=walkH(G,nw[1],nw[2],1);}
+    else{this.placed.forEach(([n,x,y],i)=>{const isN=nw&&i===this.placed.length-1;if(isN)s+=walkH(G,x,y,1);s+=ptH(G,x,y,n,'ok',isN,650);});s+=latH(G);}
+    s+='</svg>';
+    let h='';const cur=d.pts[this.k];
+    if(this.k<d.pts.length){
+      if(d.mode==='read')h+=`<p class="big">点 <b>${cur[0]}</b> の座標は？</p><div class="inrow eqt">${cur[0]}（ <input id="rx" class="sm" autocomplete="off" aria-label="x座標"> , <input id="ry" class="sm" autocomplete="off" aria-label="y座標"> ）<button class="btn" data-a="rgo">決定</button></div>`;
+      else h+=`<p class="big">点 <b>${cur[0]}(${fH(F(cur[1]))}, ${fH(F(cur[2]))})</b> をとろう。図の交わったところをタップ</p>`;
+    }else h+=clearHTML(d.mode==='read'?'全部読めた！':'全部とれた！');
+    h=`<div class="gwrap">${s}</div>`+h+`<div class="fb ${this.mc}" aria-live="polite">${this.msg}</div>`;
+    this.el.innerHTML=h;animNew(this.el);
+    this.el.querySelectorAll('.lp').forEach(c=>c.onclick=()=>this.tapPt(+c.dataset.gx,+c.dataset.gy,c));
+    const g=this.el.querySelector('[data-a="rgo"]');if(g){g.onclick=()=>this.read();inputBind(this.el,'#rx',()=>this.el.querySelector('#ry').focus());inputBind(this.el,'#ry',()=>this.read());this.el.querySelector('#rx').focus({preventScroll:true});}
+    if(this.pend){const p=this.pend;this.pend=null;if(p.shake)shake(this.el.querySelector(p.shake));if(p.conf)confetti();}
+  }
+  tapPt(x,y,c){
+    if(this.k>=this.d.pts.length)return;const [n,px,py]=this.d.pts[this.k];
+    if(x===px&&y===py){this.placed.push([n,x,y]);this.k++;fx.swoosh();setTimeout(()=>fx.ok(),600);this.msg=`右へ${px<0?'左へ':''}`.slice(0,0)+`${n}(${fH(F(px))}, ${fH(F(py))}) OK！ x 方向に進んで、y 方向に上下。`;this.mc='ok';
+      this.done();this.render([n,x,y]);return;}
+    fx.ng();this.o.onMiss&&this.o.onMiss('座標');
+    if(x===py&&y===px)this.msg=`そこは (${fH(F(x))}, ${fH(F(y))})。x と y が逆。x（横）が先、y（たて）があと。`;
+    else this.msg=`そこは (${fH(F(x))}, ${fH(F(y))})。原点 O から、まず横に ${fH(F(px))}、次にたてに ${fH(F(py))}。`;
+    this.mc='ng';if(!RM){c.style.fill=cv('--red');c.style.opacity=.6;c.animate([{r:this.G.u*.2},{r:this.G.u*.6},{r:this.G.u*.45}],{duration:400});}
+    const fb=this.el.querySelector('.fb');fb.className='fb ng';fb.innerHTML=this.msg;setTimeout(()=>{if(c.isConnected){c.style.fill='';c.style.opacity='';}},700);
+  }
+  read(){
+    const [n,px,py]=this.d.pts[this.k],rx=PF(this.el.querySelector('#rx').value.replace(/[−ー－]/g,'-')),ry=PF(this.el.querySelector('#ry').value.replace(/[−ー－]/g,'-'));
+    if(rx&&ry&&feq(rx,F(px))&&feq(ry,F(py))){this.k++;fx.swoosh();setTimeout(()=>fx.ok(),600);this.msg=`${n}(${fH(F(px))}, ${fH(F(py))}) OK！`;this.mc='ok';this.done();this.render([n,px,py]);return;}
+    this.msg=(rx&&ry&&feq(rx,F(py))&&feq(ry,F(px)))?'x と y が逆。横の目もりが先。':'原点 O から、横にいくつ、たてにいくつ進むか数えよう。左と下はマイナス。';
+    this.mc='ng';fx.ng();this.o.onMiss&&this.o.onMiss('座標');this.pend={shake:'.inrow'};this.render();
+  }
+  done(){if(this.k>=this.d.pts.length){setTimeout(()=>{fx.win();confetti();},800);this.o.onClear&&setTimeout(()=>this.o.onClear(),1900);}}
+}
+
+/* ===== 5 比例のグラフをかく・読む ===== */
+class LineG{
+  constructor(el,d,o){this.el=el;this.d=d;this.o=o;this.a=PF(d.a);this.ph=d.read?10:0;this.msg='';this.mc='';this.G=grid(-6,6,30);
+    this.qx=this.a.d===1?1:this.a.d;this.qy=fmul(this.a,F(this.qx)).n;if(Math.abs(this.qy)>6){this.qx=1;this.qy=this.a.n;}this.first=true;this.render();}
+  render(){
+    const G=this.G,d=this.d;let s=G.s,h='';
+    if(d.read){s+=lineH(G,this.a,this.first?1:0);if(this.picked)s+=ptH(G,this.picked[0],this.picked[1],'','ok',this.newPick);if(this.ph===10)s+=latH(G);}
+    else{if(this.ph>=2)s+=ptH(G,this.qx,this.qy,'','ok',this.ph===2&&this.newPick);if(this.ph>=2)s+=lineH(G,this.a,this.newPick?2:0);if(this.ph===1)s+=latH(G);}
+    s+='</svg>';
+    const ttl=d.read?`グラフの式を求めよう（${IY} = <i>a</i>${IX}）`:`${eqHi(this.a)} のグラフをかこう`;
+    h+=`<p class="big">${ttl}</p>`;
+    if(this.ph===0)h+=`<div class="inrow"><span>${IX} = ${this.qx} のとき ${IY} = </span><input id="li" autocomplete="off" aria-label="y"><button class="btn" data-a="lgo">決定</button></div>`;
+    if(this.ph===1)h+=`<p>点 (${this.qx}, ${fH(F(this.qy))}) をタップ。原点とこの点を通る直線がグラフ。</p>`;
+    if(this.ph===2)h+=`<p class="muted">${IX} が増えると ${IY} は？</p><div class="opts"><button class="opt txt" data-inc="1">増加する（右上がり）</button><button class="opt txt" data-inc="0">減少する（右下がり）</button></div>`;
+    if(this.ph===10)h+=`<p>直線が通る、${IX} も ${IY} も整数の点（原点以外）をタップしよう。</p>`;
+    if(this.ph===11)h+=`<div class="inrow"><span><i>a</i> = ${IY} ÷ ${IX} = </span><input id="ra" autocomplete="off" aria-label="a"><button class="btn" data-a="rago">決定</button></div><p class="muted" style="font-size:14px">${NOTE_FR}</p>`;
+    if(this.ph===3)h+=clearHTML(d.read?`<span class="eqt">${eqHi(this.a)}</span>`:`比例のグラフは原点を通る直線。`);
+    h=`<div class="gwrap">${s}</div>`+h+`<div class="fb ${this.mc}" aria-live="polite">${this.msg}</div>`;
+    this.el.innerHTML=h;animNew(this.el);this.first=false;this.newPick=false;
+    this.el.querySelectorAll('.lp').forEach(c=>c.onclick=()=>this.tapPt(+c.dataset.gx,+c.dataset.gy));
+    const b=this.el.querySelector('[data-a="lgo"]');if(b){b.onclick=()=>this.goY();inputBind(this.el,'#li',()=>this.goY());}
+    const r=this.el.querySelector('[data-a="rago"]');if(r){r.onclick=()=>this.goA();inputBind(this.el,'#ra',()=>this.goA());}
+    this.el.querySelectorAll('[data-inc]').forEach(x=>x.onclick=()=>this.inc(x));
+    if(this.pend){const p=this.pend;this.pend=null;if(p.shake)shake(this.el.querySelector(p.shake));if(p.conf)confetti();}
+  }
+  goY(){const r=judge(this.el.querySelector('#li').value,String(this.qy));
+    if(!r.ok){this.msg=`${IY} = ${fHp(this.a)} × ${this.qx} を計算しよう。`;this.mc='ng';fx.ng();this.o.onMiss&&this.o.onMiss('比例のグラフ');this.pend={shake:'.inrow'};this.render();return;}
+    this.ph=1;this.msg=`原点以外に通る点は (${this.qx}, ${fH(F(this.qy))})。`;this.mc='ok';fx.ok();this.render();}
+  tapPt(x,y){
+    if(this.d.read){if(this.ph!==10)return;
+      if(x===0&&y===0){this.msg='原点はどの比例のグラフも通る。ほかの点をさがそう。';this.mc='ng';fx.ng();this.render();return;}
+      if(feq(fmul(this.a,F(x)),F(y))){this.picked=[x,y];this.newPick=true;this.ph=11;fx.ok();this.msg=`(${fH(F(x))}, ${fH(F(y))}) を通る。<i>a</i> = ${fH(F(y))} ÷ ${fHp(F(x))}`;this.mc='ok';const c=ctr(this.el.querySelector(`.lp[data-gx="${x}"][data-gy="${y}"]`).getBoundingClientRect());burst(c.x,c.y,cv('--ok'));this.render();}
+      else{this.msg='その点は直線の上にない。線がちょうど目もりの交わるところを通る点をさがそう。';this.mc='ng';fx.ng();this.o.onMiss&&this.o.onMiss('比例のグラフ');this.render();}
+      return;}
+    if(this.ph!==1)return;
+    if(x===this.qx&&y===this.qy){this.ph=2;this.newPick=true;fx.swoosh();this.msg='原点と結んで、まっすぐのばす！';this.mc='ok';this.render();setTimeout(()=>fx.ok(),900);}
+    else{this.msg=`(${this.qx}, ${fH(F(this.qy))}) は、横に ${this.qx}、たてに ${fH(F(this.qy))}。`;this.mc='ng';fx.ng();this.o.onMiss&&this.o.onMiss('座標');this.render();}
+  }
+  inc(b){const up=this.a.n>0;if((b.dataset.inc==='1')===up){this.ph=3;this.msg=`${IY} = <i>a</i>${IX} で <i>a</i> が${up?'正なら右上がり（増加）':'負なら右下がり（減少）'}。`;this.mc='ok';fx.win();this.pend={conf:1};this.render();this.o.onClear&&setTimeout(()=>this.o.onClear(),1400);}
+    else{shake(b);b.disabled=true;fx.ng();this.o.onMiss&&this.o.onMiss('比例のグラフ');}}
+  goA(){const r=judge(this.el.querySelector('#ra').value,fS(this.a));
+    if(!r.ok){this.msg=r.msg.startsWith('ちがう')?'ちがうよ。'+IY+' ÷ '+IX+' を計算。分数のままでよい。':r.msg;this.mc='ng';fx.ng();this.o.onMiss&&this.o.onMiss('比例のグラフ');this.pend={shake:'.inrow'};this.render();return;}
+    this.ph=3;this.msg='';fx.win();this.pend={conf:1};this.render();this.o.onClear&&setTimeout(()=>this.o.onClear(),1400);}
+}
+
+/* ===== 6 反比例のグラフ ===== */
+class Hyper{
+  constructor(el,d,o){this.el=el;this.d=d;this.o=o;this.a=d.a;this.vals={};this.ph=d.read?10:0;this.msg='';this.mc='';this.G=grid(-7,7,26);this.first=true;this.render();}
+  render(){
+    const G=this.G,d=this.d;let s=G.s;
+    if(d.read){s+=hypH(G,this.a,this.first);const [px,py]=d.pt;s+=ptH(G,px,py,'A','cur');}
+    else{d.xs.forEach(x=>{if(this.vals[x]!=null)s+=ptH(G,x,this.a/x,'','ok',this.newX===x);});if(this.ph===1)s+=hypH(G,this.a,this.newCurve);}
+    s+='</svg>';let h=`<div class="gwrap">${s}</div>`;
+    if(d.read){
+      h+=`<p class="big">反比例 ${IY} = ${fr('<i>a</i>',IX)} のグラフ。点 A(${d.pt[0]}, ${fH(F(d.pt[1]))}) を通る。</p>`;
+      if(this.ph===10)h+=`<div class="inrow"><span><i>a</i> = ${IX}${IY} = </span><input id="ha" autocomplete="off" aria-label="a"><button class="btn" data-a="hago">決定</button></div>`;
+      if(this.ph===11){const [qx,qy]=d.check;h+=`<p>点 (${fH(PF(qx))}, ${fH(PF(qy))}) は、このグラフの上にある？</p><div class="opts"><button class="opt txt" data-on="1">ある</button><button class="opt txt" data-on="0">ない</button></div>`;}
+      if(this.ph===12)h+=clearHTML(`<span class="eqt">${eqHan(F(this.a))}</span>。${IX}${IY} がいつも ${fH(F(this.a))} になる点がグラフの上にある。`);
+    }else{
+      h+=`<p class="big">${eqHan(F(this.a))} の表をうめると、点がグラフにあらわれる</p><div class="tblw"><table class="vt"><tr><th>${IX}</th>${d.xs.map(x=>`<td>${fH(F(x))}</td>`).join('')}</tr><tr><th>${IY}</th>${d.xs.map(x=>this.vals[x]!=null?`<td class="okc">${fH(PF(this.vals[x]))}</td>`:`<td><input class="cell" data-x="${x}" autocomplete="off" aria-label="x=${x} のときの y"></td>`).join('')}</tr></table></div>`;
+      if(this.ph===1)h+=clearHTML(`点をなめらかな曲線で結ぶと双曲線。${this.a>0?'右上と左下':'左上と右下'}の2本で1組。軸とはまじわらない。`);
+      else h+=`<p class="muted" style="font-size:14px">${IY} = ${fH(F(this.a))} ÷ ${IX}。打ちこんで Enter</p>`;
+    }
+    h+=`<div class="fb ${this.mc}" aria-live="polite">${this.msg}</div>`;
+    this.el.innerHTML=h;animNew(this.el);this.first=false;this.newX=null;this.newCurve=false;
+    this.el.querySelectorAll('.cell').forEach(c=>c.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();this.cell(c);}});
+    const f=this.el.querySelector('.cell');if(f)f.focus({preventScroll:true});
+    const b=this.el.querySelector('[data-a="hago"]');if(b){b.onclick=()=>this.goA();inputBind(this.el,'#ha',()=>this.goA());}
+    this.el.querySelectorAll('[data-on]').forEach(x=>x.onclick=()=>this.on(x));
+    if(this.pend){const p=this.pend;this.pend=null;if(p.shake)shake(this.el.querySelector(p.shake));if(p.conf)confetti();}
+  }
+  cell(c){const x=+c.dataset.x,ans=fdiv(F(this.a),F(x)),r=judge(c.value,fS(ans));
+    if(!r.ok){fx.ng();shake(c);this.o.onMiss&&this.o.onMiss('反比例のグラフ');const fb=this.el.querySelector('.fb');fb.className='fb ng';fb.textContent=`${this.a} ÷ (${x}) を計算しよう。マイナスの符号に注意。`;return;}
+    this.vals[x]=fS(ans);this.newX=x;fx.ok();this.msg='';
+    if(this.d.xs.every(v=>this.vals[v]!=null)){this.ph=1;this.newCurve=true;setTimeout(()=>{fx.swoosh();},200);setTimeout(()=>{fx.win();confetti();},1400);this.o.onClear&&setTimeout(()=>this.o.onClear(),2300);}
+    this.render();}
+  goA(){const r=judge(this.el.querySelector('#ha').value,String(this.a));
+    if(!r.ok){this.msg=`反比例は <i>a</i> = ${IX} × ${IY}。${this.d.pt[0]} × ${fHp(F(this.d.pt[1]))}`;this.mc='ng';fx.ng();this.o.onMiss&&this.o.onMiss('反比例の式');this.pend={shake:'.inrow'};this.render();return;}
+    this.ph=11;fx.ok();this.msg=`${eqHan(F(this.a))}`;this.mc='ok';this.render();}
+  on(b){const [qx,qy]=this.d.check,on=feq(fmul(PF(qx),PF(qy)),F(this.a));
+    if((b.dataset.on==='1')===on){this.ph=12;this.msg=`${fH(PF(qx))} × ${fHp(PF(qy))} = ${fH(fmul(PF(qx),PF(qy)))}。${on?'a と同じなので、ある。':'a とちがうので、ない。'}`;this.mc='ok';fx.win();this.pend={conf:1};this.render();this.o.onClear&&setTimeout(()=>this.o.onClear(),1500);}
+    else{shake(b);b.disabled=true;fx.ng();this.o.onMiss&&this.o.onMiss('反比例のグラフ');const fb=this.el.querySelector('.fb');fb.className='fb ng';fb.innerHTML=`${IX} × ${IY} を計算して、<i>a</i> になるか調べよう。`;}}
+}
+
+/* ===== 7 比例・反比例の利用（表を見て見分ける） ===== */
+class WordK{
+  constructor(el,d,o){this.el=el;this.d=d;this.o=o;this.si=0;this.msg='';this.mc='';this.hint=false;this.a=PF(d.a);this.pend={tbl:1};this.render();}
+  render(){
+    const d=this.d,st=d.steps[this.si];let h=`<p class="story">${md(d.story)}</p>`;
+    h+=`<div class="tblw"><table class="vt" id="kt"><tr><th>${md(d.xl)}</th>${d.xs.map(v=>`<td>${fH(PF(v))}</td>`).join('')}</tr><tr><th>${md(d.yl)}</th>${d.ys.map(v=>`<td>${fH(PF(v))}</td>`).join('')}</tr></table></div>`;
+    const done=d.steps.slice(0,this.si);
+    if(done.includes('kind'))h+=`<p class="tag2">${d.kind==='hi'?'比例':'反比例'}</p>`;
+    if(done.includes('a'))h+=`<div class="eqbig" data-eq>${d.kind==='hi'?eqHi(this.a):eqHan(this.a)}</div>`;
+    if(st==='kind')h+=`<p>はじめの列とくらべて、${IX} が 2倍、3倍…になると ${IY} は？ <button class="tool undo" data-a="replay">もう一度見る</button></p><div class="opts lever"><button class="opt big2" data-k="hi">比例</button><button class="opt big2" data-k="han">反比例</button></div>`;
+    if(st==='a')h+=`<div class="inrow"><span>${d.kind==='hi'?`${IY} = <i>a</i>${IX} の`:`${IY} = ${fr('<i>a</i>',IX)} の`} <i>a</i> = </span><input id="wa" autocomplete="off" aria-label="a"><button class="btn" data-a="wago">決定</button><button class="tool undo" data-a="hint">ヒント</button></div>${this.hint?`<span class="hintline">${d.kind==='hi'?'<i>a</i> = '+IY+' ÷ '+IX:'<i>a</i> = '+IX+' × '+IY}（表のどの列でも同じ）</span>`:''}`;
+    if(st==='ask')h+=`<div class="inrow"><span>${md(d.askQ)} </span><input id="wq" autocomplete="off" aria-label="答え"><button class="btn" data-a="wqgo">決定</button></div>`;
+    if(st==='unit')h+=`<div class="panel"><div>答えの書き方は？</div><div class="opts">${shuffle(d.unit.map((u,i)=>[u,i])).map(([u,i])=>`<button class="opt txt" data-u="${i}">${md(u)}</button>`).join('')}</div></div>`;
+    if(!st)h+=clearHTML(md(d.why||''));
+    h+=`<div class="fb ${this.mc}" aria-live="polite">${this.msg}</div>`;
+    this.el.innerHTML=h;this.bind();
+    const p=this.pend;this.pend={};
+    if(p.tbl)this.playTbl();if(p.shake)shake(this.el.querySelector(p.shake));if(p.conf)confetti();
+    if(p.eq&&!RM){const e=this.el.querySelector('[data-eq]');e.animate([{transform:'scale(2.2) rotate(-6deg)',opacity:0},{transform:'none',opacity:1}],{duration:480,easing:'ease-in'});setTimeout(()=>{fx.stamp();const c=ctr(e.getBoundingClientRect());burst(c.x,c.y,cv('--ok'),12,70);},300);}
+    if(p.kind&&!RM){const t=this.el.querySelector('.tag2');t&&t.animate([{transform:'scale(2)',opacity:0},{transform:'none',opacity:1}],{duration:420,easing:'cubic-bezier(.34,1.56,.64,1)'});}
+  }
+  async playTbl(){
+    if(RM)return;const tb=this.el.querySelector('#kt');if(!tb)return;const rows=tb.querySelectorAll('tr'),xc=rows[0].querySelectorAll('td'),yc=rows[1].querySelectorAll('td');
+    for(let i=1;i<xc.length;i++){
+      const rx=fdiv(PF(this.d.xs[i]),PF(this.d.xs[0])),ry=fdiv(PF(this.d.ys[i]),PF(this.d.ys[0]));
+      const a=xc[i].getBoundingClientRect(),c=yc[i].getBoundingClientRect();
+      [xc[0],xc[i],yc[0],yc[i]].forEach(z=>z.animate([{background:cv('--marker')},{background:cv('--card')}],{duration:1100}));
+      const t1=fxel('×'+fH(rx),'fxtok tagk',a.left+a.width/2,a.top-16),t2=fxel('×'+fH(ry),'fxtok tagk',c.left+c.width/2,c.bottom+16);
+      [t1,t2].forEach((t,j)=>t.animate([{transform:`${C0} scale(0)`,opacity:0},{transform:`${C0} scale(1.25)`,opacity:1,offset:.15},{transform:`${C0} scale(1)`,opacity:1,offset:.85},{transform:`${C0}`,opacity:0}],{duration:2000,delay:j*400}).finished.then(()=>t.remove()));
+      tone([[600+i*120,.08],[800+i*120,.1]]);
+      await wait(1300);
+      if(!this.el.isConnected)return;
+    }
+  }
+  bind(){
+    const q=s=>this.el.querySelectorAll(s);
+    q('[data-k]').forEach(b=>b.onclick=()=>{if(b.dataset.k===this.d.kind){fx.clear();this.si++;this.msg=this.d.kind==='hi'?`${IX} が2倍になると ${IY} も2倍。比例。`:`${IX} が2倍になると ${IY} は[1|2]倍。反比例。`;this.msg=md(this.msg);this.mc='ok';this.pend={kind:1};this.next();}
+      else{shake(b);b.disabled=true;fx.ng();this.o.onMiss&&this.o.onMiss('見分ける');const fb=this.el.querySelector('.fb');fb.className='fb ng';fb.textContent='表の矢印を見よう。y も同じ倍になれば比例、逆の倍（1/2倍、1/3倍）なら反比例。';}});
+    const rp=this.el.querySelector('[data-a="replay"]');if(rp)rp.onclick=()=>this.playTbl();
+    const hb=this.el.querySelector('[data-a="hint"]');if(hb)hb.onclick=()=>{this.hint=true;this.render();};
+    const wa=this.el.querySelector('[data-a="wago"]');if(wa){wa.onclick=()=>this.goA();inputBind(this.el,'#wa',()=>this.goA());}
+    const wq=this.el.querySelector('[data-a="wqgo"]');if(wq){wq.onclick=()=>this.goQ();inputBind(this.el,'#wq',()=>this.goQ());}
+    q('[data-u]').forEach(b=>b.onclick=()=>{if(b.dataset.u==='0'){fx.ok();this.si++;this.msg='';this.next();}else{shake(b);b.disabled=true;fx.ng();this.o.onMiss&&this.o.onMiss('解き切る');const fb=this.el.querySelector('.fb');fb.className='fb ng';fb.textContent='聞かれているものと単位を、もう一度問題文で確かめよう。';}});
+  }
+  goA(){const r=judge(this.el.querySelector('#wa').value,fS(this.a));
+    if(!r.ok){this.msg=r.msg.startsWith('ちがう')?'ちがうよ。表の1列を使って計算しよう。':r.msg;this.mc='ng';fx.ng();this.o.onMiss&&this.o.onMiss('式');this.pend={shake:'.inrow'};this.render();return;}
+    fx.ok();this.si++;this.msg='';this.pend={eq:1};this.next();}
+  goQ(){const r=judge(this.el.querySelector('#wq').value,this.d.askA);
+    if(!r.ok){this.msg=r.msg.startsWith('ちがう')?'ちがうよ。式に代入して計算しよう。':r.msg;this.mc='ng';fx.ng();this.o.onMiss&&this.o.onMiss('値を求める');this.pend={shake:'.inrow'};this.render();return;}
+    fx.ok();this.si++;this.msg='';this.next();}
+  next(){if(this.si>=this.d.steps.length){fx.win();this.pend.conf=1;this.render();this.o.onClear&&setTimeout(()=>this.o.onClear(),1400);}else this.render();}
+}
+const ACT={ineq:Ineq,func:Func,find:Find,plot:Plot,line:LineG,hyper:Hyper,word:WordK};
+
+/* ===== 式をさわるエンジン ===== */
+const hasX=l=>l.some(t=>t.x||(t.t==='g'&&t.items.some(i=>i.x)));
+class Engine{
+  constructor(el,src,o={}){this.el=el;this.o=o;this.hist=[];this.msg='';this.msgCls='';this.pend={};this.busy=false;this.ang=0;
+    if(src.includes(':')){const[a,b]=src.split('=');const[A,B]=a.split(':'),[C,D]=b.split(':');
+      this.parts=[A,B,C,D].map(p=>unwrap(parseSide(p)));this.mode='prop';this.sel=[];this.pphase=0;
+      this.ans=solve(mulParts(this.parts[0],this.parts[3]),mulParts(this.parts[1],this.parts[2]));}
+    else{const[a,b]=src.split('=');this.L=parseSide(a);this.R=parseSide(b);this.mode='normal';this.ans=solve(this.L,this.R);this.check(true);}
+    window.__eng=this;this.render();}
+  miss(type,msg,sh){this.msg=msg;this.msgCls='ng';fx.ng();if(sh)this.pend.shake=sh;if(type){S.miss[type]=(S.miss[type]||0)+1;save();}this.o.onMiss&&this.o.onMiss(type);}
+  say(msg){this.msg=msg;this.msgCls='ok';}
+  push(){this.hist.push(cp({L:this.L,R:this.R}));}
+  side(s){return s==='L'?this.L:this.R;}
+  allItems(){return this.L.concat(this.R);}
+  hasNonInt(){return this.allItems().some(it=>it.t==='n'?!fint(it.c):(!fint(it.k)||it.items.some(t=>!fint(t.c))));}
+  denoms(){const ds=[];this.allItems().forEach(it=>{if(it.t==='n')ds.push(it.c.d);else{ds.push(it.k.d);it.items.forEach(t=>ds.push(t.c.d));}});return ds;}
+  combinable(s){const l=this.side(s);if(l.some(t=>t.t==='g'))return false;return l.filter(t=>t.x).length>=2||l.filter(t=>!t.x).length>=2;}
+  rects(){const m={};this.el.querySelectorAll('[data-id]').forEach(e=>m[e.dataset.id]=e.getBoundingClientRect());return m;}
+  render(){
+    const prev=this.rects(),prevAng=this.ang;
+    const m=this.mode;let h='';
+    if(m==='prop'){
+      h+=`<p class="goal">${this.pphase===0?'比例式は「外どうし＝内どうし」。まず<b>外どうし</b>（いちばん外の2つ）をタップ':'次は<b>内どうし</b>（まん中の2つ）をタップ'}</p>`;
+      const ph=(i)=>{const l=this.parts[i];const inner=l.length>1?'('+sideH(l)+')':sideH(l);
+        return `<button class="it ${this.sel.includes(i)?'sel':''}" data-p="${i}" data-id="p${i}">${inner}</button>`;};
+      h+=`<div class="eqwrap prop"><div class="eqrow">${ph(0)}<span class="colon">:</span>${ph(1)}<span class="eqs">=</span>${ph(2)}<span class="colon">:</span>${ph(3)}</div><svg class="arcs"></svg></div>`;
+    }else{
+      const goal={normal:this.goalText(),stamp:`<b>×${this.stamp?this.stamp.m:''}</b> を、左辺も右辺も<b>全部の項</b>に配ろう（タップ）。てんびんが水平になればOK`,
+        dist:'かっこの前の数を、かっこの中の全部の項にかける（バン！）',comb:'同じ種類の項をまとめよう',final:'最後のわり算。x の係数でわる',done:''}[m]||'';
+      h+=`<p class="goal">${goal}</p>`;
+      const row=(s)=>{const l=this.side(s);if(!l.length)return`<span class="it fixed">0</span>`;
+        return l.map((t,j)=>{const sg=isNeg(t)?'−':(j?'+':'');let cls='it';
+          if(t.t==='g')cls+=' grp';if(m==='stamp')cls+=this.stamp.done.has(t.id)?' stamped':' stampable';
+          const dg=m==='dist'&&this.dist&&this.dist.id===t.id;if(dg)cls+=' sel';
+          if(m==='done'||m==='final')cls+=' fixed';
+          return `<button class="${cls}" data-s="${s}" data-i="${j}" data-id="${t.id}">${sg?'<span class="sg">'+sg+'</span> ':''}${t.t==='g'?grpAbsW(t,dg?this.dist.j:-1):itemAbs(t)}${m==='stamp'&&this.stamp.done.has(t.id)?`<span class="st">×${this.stamp.m}</span>`:''}</button>`;}).join(' ');};
+      h+=`<div class="eqwrap"><div class="eqrow" id="eqrow">${row('L')}<span class="eqs">=</span>${row('R')}</div></div>`;
+      let ang=0;if(m==='stamp'){const f=s=>{const l=this.side(s);return l.length?l.filter(t=>this.stamp.done.has(t.id)).length/l.length:1;};ang=(f('R')-f('L'))*14;}this.ang=ang;
+      h+=`<svg class="seesaw" viewBox="0 0 260 60" aria-hidden="true"><g class="beam" style="transform:rotate(${ang}deg)"><line x1="10" y1="22" x2="250" y2="22"/><text x="30" y="14">左辺</text><text x="205" y="14">右辺</text></g><path d="M130 24 L116 52 L144 52 Z"/></svg>`;
+    }
+    h+=this.panel();
+    h+=`<div class="fb ${this.msgCls}" aria-live="polite">${this.msg}</div>`;
+    this.el.innerHTML=h;this.bind();this.after(prev,prevAng);
+  }
+  after(prev,prevAng){
+    const p=this.pend;this.pend={};
+    this.drawArcs(p.arc);
+    if(p.shake)shake(this.el.querySelector(p.shake));
+    if(p.confetti)confetti();
+    if(RM)return;
+    const beam=this.el.querySelector('.beam');
+    if(beam&&prevAng!==this.ang)beam.animate([{transform:`rotate(${prevAng}deg)`},{transform:`rotate(${this.ang}deg)`}],{duration:750,easing:'cubic-bezier(.34,1.9,.5,1)'});
+    const first=!Object.keys(prev).length,red=cv('--red'),ok=cv('--ok');
+    this.el.querySelectorAll('.eqrow [data-id]').forEach((e,idx)=>{
+      const id=e.dataset.id,r=e.getBoundingClientRect(),o=prev[id];
+      if(p.moved==id&&o){const dx=o.left-r.left,dy=o.top-r.top;
+        e.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:`translate(${dx/2}px,${dy/2-75}px) rotateY(180deg) scale(1.3)`,offset:.5},{transform:'none'}],{duration:700,easing:'ease-in-out'});
+        const sg=e.querySelector('.sg');if(sg)sg.animate([{color:red,transform:'scale(2.2)'},{color:red,transform:'scale(1)',offset:.6},{transform:'scale(1)'}],{duration:900,delay:650,fill:'backwards'});
+        const eqs=this.el.querySelector('.eqrow .eqs');if(eqs)eqs.animate([{transform:'scale(1)'},{transform:'scale(1.8)',color:red},{transform:'scale(1)'}],{duration:420,delay:230});
+      }else if(p.spawn&&p.spawn[id]){const f=ctr(p.spawn[id]),c=ctr(r);
+        e.animate([{transform:`translate(${f.x-c.x}px,${f.y-c.y}px) scale(.3)`,opacity:.1},{transform:'none',opacity:1}],{duration:520,delay:(p.spawnOrder||[]).indexOf(id)*110,easing:'cubic-bezier(.34,1.56,.64,1)',fill:'backwards'});
+      }else if(o){const dx=o.left-r.left,dy=o.top-r.top;if(Math.abs(dx)>1||Math.abs(dy)>1)e.animate([{transform:`translate(${dx}px,${dy}px)`},{transform:'none'}],{duration:340,easing:'ease-out'});
+      }else e.animate([{transform:'scale(.4) translateY(14px)',opacity:0},{transform:'none',opacity:1}],{duration:360,delay:first?idx*80:0,easing:'cubic-bezier(.34,1.56,.64,1)',fill:'backwards'});
+      if(p.glow&&p.glow.includes(id))e.animate([{boxShadow:`0 0 0 0 ${ok}`,borderColor:ok},{boxShadow:'0 0 0 14px transparent'}],{duration:800,delay:200});
+    });
+  }
+  drawArcs(anim){
+    const svg=this.el.querySelector('.arcs');if(!svg)return;
+    const w=svg.getBoundingClientRect(),pr=i=>this.el.querySelector(`[data-p="${i}"]`).getBoundingClientRect();
+    let h='';
+    const arc=(a,b,up,k,label)=>{const x1=a.left+a.width/2-w.left,x2=b.left+b.width/2-w.left,y1=(up?a.top:a.bottom)-w.top,y2=(up?b.top:b.bottom)-w.top,dy=up?-48:44;
+      h+=`<path data-k="${k}" d="M${x1} ${y1} C${x1} ${y1+dy} ${x2} ${y2+dy} ${x2} ${y2}"/><text data-k="${k}" x="${(x1+x2)/2}" y="${(y1+y2)/2+dy*.75+(up?-8:18)}" text-anchor="middle">${label}</text>`;};
+    if(this.mode==='prop'&&this.pphase>=1)arc(pr(0),pr(3),true,'outer','外どうし');
+    if(this.mode==='prop'&&this.innerDone)arc(pr(1),pr(2),false,'inner','内どうし');
+    svg.innerHTML=h;
+    if(anim&&!RM){svg.querySelectorAll(`path[data-k="${anim}"]`).forEach(pa=>{const L=pa.getTotalLength();pa.style.strokeDasharray=L;
+      pa.animate([{strokeDashoffset:L},{strokeDashoffset:0}],{duration:650,easing:'ease-out'});});
+      svg.querySelectorAll(`text[data-k="${anim}"]`).forEach(t=>t.animate([{opacity:0},{opacity:1}],{duration:300,delay:500,fill:'backwards'}));}
+  }
+  goalText(){
+    if(this.allItems().some(t=>t.t==='g'&&(fint(t.k)||t.dec)))return'太わくの項は「かっこ」。かっこの前の数をタップすると、かっこがはずれる';
+    if(this.hasNonInt())return'分数・小数がある。「両辺に同じ数をかける」で消そう';
+    if(this.R.some(t=>t.x)||(this.L.some(t=>!t.x)&&this.L.some(t=>t.x)))return'項をタップすると、＝の反対側へ<b>移項</b>（符号が変わる）。x は左、数は右へ';
+    if(this.combinable('L')||this.combinable('R'))return'「まとめる」で計算しよう';
+    if(!hasX(this.L)&&hasX(this.R))return'x が右にある。「左右を入れかえる」と見やすい';
+    return'';
+  }
+  panel(){
+    const m=this.mode;
+    if(m==='normal'){
+      let t='';
+      if(this.hasNonInt())t+=`<button class="tool" data-a="mul">両辺に同じ数をかける</button>`;
+      if(this.combinable('L'))t+=`<button class="tool" data-a="combL">左辺をまとめる</button>`;
+      if(this.combinable('R'))t+=`<button class="tool" data-a="combR">右辺をまとめる</button>`;
+      if(!hasX(this.L)&&hasX(this.R))t+=`<button class="tool" data-a="swap">左右を入れかえる</button>`;
+      if(this.hist.length)t+=`<button class="tool undo" data-a="undo">1つ戻る</button>`;
+      if(this.chooseM)return`<div class="panel"><div>何をかける？（分母や小数が全部消える数）</div><div class="opts">${this.chooseM.map(v=>`<button class="opt" data-m="${v}">×${v}</button>`).join('')}</div><button class="tool undo" data-a="cancel">やめる</button></div>`;
+      return`<div class="tools">${t}</div>`;
+    }
+    if(m==='dist'){const d=this.dist,g=this.distG,t=g.items[d.j];
+      const kH=(isNeg({t:'g',k:g.k})?'(−'+numH(g.k,g.dec)+')':numH(g.k,g.dec)),tH=isNeg(t)?'(−'+termAbs(t)+')':termAbs(t);
+      return`<div class="panel"><div class="q">${kH} × ${tH} = ?</div><div class="opts">${shuffle([1,0]).map(ok=>{const c=ok?fmul(g.k,t.c):fneg(fmul(g.k,t.c));const tt={c,x:t.x,dec:g.dec||t.dec};
+        return`<button class="opt" data-ok="${ok}">${c.n<0?'−':'+'}${termAbs(tt)}</button>`;}).join('')}</div>
+        <div class="muted" style="font-size:14px">${d.res.length?'できた項：'+innerH(d.res):'かっこの中の項は '+g.items.length+'つ。全部にかける'}</div></div>`;}
+    if(m==='comb'){const l=this.side(this.comb);const xs=l.filter(t=>t.x),ns=l.filter(t=>!t.x);let r='';
+      if(xs.length>=2)r+=`<div class="inrow"><span class="eqt">${innerH(xs)} = </span><input id="cx" aria-label="xの係数" autocomplete="off"><span class="eqt">${X}</span></div>`;
+      if(ns.length>=2)r+=`<div class="inrow"><span class="eqt">${innerH(ns)} = </span><input id="cn" aria-label="数" autocomplete="off"></div>`;
+      return`<div class="panel"><div>${this.comb==='L'?'左辺':'右辺'}をまとめる（計算して打ちこむ）</div>${r}<button class="btn" data-a="combgo">決定</button> <button class="tool undo" data-a="cancel">やめる</button></div>`;}
+    if(m==='stamp')return`<div class="tools"><button class="tool undo" data-a="cancel">やめる</button></div>`;
+    if(m==='final'){const a=this.L[0].c,b=this.R.length?this.R[0].c:F(0);
+      return`<div class="panel"><div class="inrow"><span class="eqt">${X} = </span><input id="fin" aria-label="答え" autocomplete="off" placeholder="例 -3、9/2"><button class="btn" data-a="fingo">答え合わせ</button><button class="tool undo" data-a="hint">ヒント</button></div>
+        ${this.showHint?`<span class="hintline">${X} = （右の数）÷（${X}の係数）＝ ${numH(b,false)==='0'?'0':(b.n<0?'(−'+numH(b)+')':numH(b))} ÷ ${a.n<0?'(−'+numH(a)+')':numH(a)}。わり切れなければ分数のまま、約分も</span>`:''}</div>`;}
+    if(m==='done')return`<div class="clearbox pop"><b>${X} = ${ansH(this.ans)}</b><div>${this.o.doneText||'クリア！ 紙では、もとの式に入れて「たしかめ算」もしよう。'}</div></div>`;
+    return'';
+  }
+  bind(){
+    const q=s=>this.el.querySelectorAll(s);
+    q('[data-p]').forEach(b=>b.onclick=()=>this.propTap(+b.dataset.p));
+    q('.it[data-s]').forEach(b=>b.onclick=()=>this.tap(b.dataset.s,+b.dataset.i));
+    q('[data-a]').forEach(b=>b.onclick=()=>this.act(b.dataset.a));
+    q('[data-m]').forEach(b=>b.onclick=()=>this.pickM(+b.dataset.m));
+    q('[data-ok]').forEach(b=>b.onclick=()=>this.distPick(b.dataset.ok==='1',b));
+    const fin=this.el.querySelector('#fin');if(fin){fin.focus({preventScroll:true});fin.onkeydown=e=>{if(e.key==='Enter')this.act('fingo');};}
+    const cx=this.el.querySelector('#cx')||this.el.querySelector('#cn');if(cx){cx.focus({preventScroll:true});
+      q('.panel input').forEach(i=>i.onkeydown=e=>{if(e.key==='Enter')this.act('combgo');});}
+  }
+  async propTap(i){
+    if(this.busy)return;
+    const want=this.pphase===0?[0,3]:[1,2];
+    if(!want.includes(i)){this.miss('比例式',this.pphase===0?'外どうしは、いちばん左といちばん右の2つ。':'内どうしは、まん中の2つ。',`[data-p="${i}"]`);this.render();return;}
+    if(!this.sel.includes(i))this.sel.push(i);fx.ok();
+    if(want.every(w=>this.sel.includes(w))){
+      if(this.pphase===0){this.pphase=1;this.sel=[];this.say('外どうし OK！');this.pend.arc='outer';fx.swoosh();}
+      else{
+        this.innerDone=true;this.pend.arc='inner';this.say('内どうし OK！ かけ算して式にするよ');fx.swoosh();this.render();
+        this.busy=true;await wait(RM?0:900);
+        const u=(a,b)=>{const A=this.el.querySelector(`[data-p="${a}"]`).getBoundingClientRect(),B=this.el.querySelector(`[data-p="${b}"]`).getBoundingClientRect();
+          return{left:Math.min(A.left,B.left),top:Math.min(A.top,B.top),width:Math.max(A.right,B.right)-Math.min(A.left,B.left),height:Math.max(A.bottom,B.bottom)-Math.min(A.top,B.top)};};
+        const u03=u(0,3),u12=u(1,2);
+        this.L=mulParts(this.parts[0],this.parts[3]);this.R=mulParts(this.parts[1],this.parts[2]);this.mode='normal';this.innerDone=false;
+        this.pend.spawn={};this.L.forEach(t=>this.pend.spawn[t.id]=u03);this.R.forEach(t=>this.pend.spawn[t.id]=u12);
+        this.pend.spawnOrder=this.L.concat(this.R).map(t=>String(t.id));
+        fx.bang();this.say('外どうし ＝ 内どうし の式になった。ここからはふつうの方程式。');this.check();this.busy=false;
+      }
+    }
+    this.render();
+  }
+  async tap(s,i){
+    if(this.busy)return;
+    const l=this.side(s),it=l[i];this.msg='';
+    if(this.mode==='stamp'){if(this.stamp.done.has(it.id))return;
+      this.busy=true;await stampDrop(this.el.querySelector(`.it[data-id="${it.id}"]`),'×'+this.stamp.m);this.busy=false;
+      this.stamp.done.add(it.id);fx.stamp();
+      if(this.allItems().every(t=>this.stamp.done.has(t.id))){const m=F(this.stamp.m);
+        this.allItems().forEach(t=>{if(t.t==='n')t.c=fmul(t.c,m);else t.k=fmul(t.k,m);});
+        this.pend.glow=this.allItems().map(t=>String(t.id));
+        this.mode='normal';this.stamp=null;fx.clear();this.say('全部の項にかけられた！ てんびんは水平のまま。');this.check();}
+      this.render();return;}
+    if(this.mode!=='normal')return;
+    if(it.t==='g'){
+      if(!fint(it.k)&&!it.dec){this.miss('','分数のかっこは、先に「両辺に同じ数をかける」で分母を消そう。',`.it[data-id="${it.id}"]`);this.render();return;}
+      this.push();this.mode='dist';this.dist={s,id:it.id,j:0,res:[]};this.distG=it;this.render();return;}
+    this.push();l.splice(i,1);it.c=fneg(it.c);this.side(s==='L'?'R':'L').push(it);this.pend.moved=String(it.id);fx.swoosh();
+    this.say(`移項したので符号が ${isNeg(it)?'＋ → −':'− → ＋'} に変わった。`);this.check();this.render();
+  }
+  async distPick(ok,btn){
+    if(this.busy)return;
+    const g=this.distG,d=this.dist,t=g.items[d.j];
+    if(!ok){shake(btn);btn.disabled=true;this.msg=isNeg(g)?'マイナス×マイナス＝プラス、マイナス×プラス＝マイナス。':'符号をよく見よう。';this.msgCls='ng';fx.ng();
+      S.miss[isNeg(g)?'マイナスのかっこ':'かっこ']=(S.miss[isNeg(g)?'マイナスのかっこ':'かっこ']||0)+1;save();this.o.onMiss&&this.o.onMiss();
+      this.el.querySelector('.fb').textContent=this.msg;this.el.querySelector('.fb').className='fb ng';return;}
+    this.busy=true;
+    const gEl=this.el.querySelector(`.it[data-id="${g.id}"]`),tgt=gEl&&gEl.querySelector(`.gin[data-j="${d.j}"]`);
+    const kLabel='×'+(g.k.n<0?'(−'+numH(g.k,g.dec)+')':numH(g.k,g.dec));
+    if(gEl&&tgt){const fromR=(gEl.querySelector('.gk')||gEl).getBoundingClientRect(),toR=tgt.getBoundingClientRect();
+      await shot(fromR,toR,kLabel,'fxtok',260);const c=ctr(toR);burst(c.x,c.y,cv('--red'),12,40);}
+    fx.bang();d.res.push(TM(fmul(g.k,t.c),t.x,g.dec||t.dec));d.j++;this.busy=false;
+    if(d.j>=g.items.length){const l=this.side(d.s),idx=l.findIndex(x=>x.id===g.id);
+      if(gEl){const gr=gEl.getBoundingClientRect();this.pend.spawn={};d.res.forEach(r=>this.pend.spawn[r.id]=gr);this.pend.spawnOrder=d.res.map(r=>String(r.id));}
+      l.splice(idx,1,...d.res);
+      this.mode='normal';this.dist=null;this.say('かっこがはずれた！');this.check();}
+    else this.msg='';
+    this.render();
+  }
+  async act(a){
+    if(this.busy)return;
+    this.msg='';
+    if(a==='undo'&&this.hist.length){const h=this.hist.pop();this.L=h.L;this.R=h.R;this.mode='normal';this.chooseM=null;this.stamp=null;}
+    if(a==='cancel'){if(this.mode==='dist'||this.mode==='comb'){const h=this.hist.pop();if(h){this.L=h.L;this.R=h.R;}}
+      this.mode='normal';this.chooseM=null;this.stamp=null;this.dist=null;}
+    if(a==='mul'){
+      if(this.allItems().some(t=>t.t==='g'&&t.items.some(x=>!fint(x.c)))){this.miss('小数','かっこの中にも小数（分数）がある。先にかっこの前の数をタップして、かっこをはずそう。','.eqrow .grp');this.render();return;}
+      const L=this.denoms().reduce(lcm,1);const cand=new Set([L]);this.denoms().forEach(d=>{if(d>1&&d<L)cand.add(d);});
+      if(cand.size<3)cand.add(L*2);if(cand.size<3&&L%2===0&&L>2)cand.add(L/2);
+      this.chooseM=shuffle([...cand].slice(0,3));this.Lcm=L;}
+    if(a==='combL'||a==='combR'){this.push();this.mode='comb';this.comb=a==='combL'?'L':'R';}
+    if(a==='combgo')return this.combGo();
+    if(a==='swap'){this.push();[this.L,this.R]=[this.R,this.L];fx.swoosh();this.check();}
+    if(a==='hint'){this.showHint=true;}
+    if(a==='fingo'){const v=this.el.querySelector('#fin').value;const r=judge(v,fStr(this.ans));
+      if(r.ok){
+        this.busy=true;const lEl=this.el.querySelector('.eqrow .it'),its=this.el.querySelectorAll('.eqrow .it'),rEl=its[its.length-1];
+        const a=this.L[0].c,lab='÷'+(a.n<0?'(−':'')+(a.d===1?Math.abs(a.n):Math.abs(a.n)+'/'+a.d)+(a.n<0?')':'');
+        if(lEl&&rEl){await shot(lEl.getBoundingClientRect(),rEl.getBoundingClientRect(),lab,'fxtok divk',420);const c=ctr(rEl.getBoundingClientRect());burst(c.x,c.y,cv('--ok'),12,50);}
+        this.busy=false;this.mode='done';fx.clear();this.pend.confetti=true;this.render();this.o.onClear&&setTimeout(()=>this.o.onClear(),1100);return;}
+      this.miss('わり算',r.msg,'.panel .inrow');}
+    this.render();
+  }
+  pickM(v){
+    const ok=this.allItems().every(t=>t.t==='n'?fint(fmul(t.c,F(v))):fint(fmul(t.k,F(v))));
+    if(!ok){this.miss('分数',`×${v} では、まだ分母が残る。分母が全部わり切れる数（最小公倍数）を選ぼう。`,'.panel .opts');this.render();return;}
+    this.chooseM=null;this.push();this.mode='stamp';this.stamp={m:v,done:new Set()};
+    if(v!==this.Lcm)this.say(`×${v} でもできるけど、×${this.Lcm}（最小公倍数）だと数が小さくてらく。`);
+    this.render();
+  }
+  async combGo(){
+    const l=this.side(this.comb),xs=l.filter(t=>t.x),ns=l.filter(t=>!t.x);
+    const sx=xs.reduce((a,t)=>fadd(a,t.c),F(0)),sn=ns.reduce((a,t)=>fadd(a,t.c),F(0));
+    let bad=false;
+    if(xs.length>=2){let v=this.el.querySelector('#cx').value.normalize('NFKC').replace(/[−ー－]/g,'-').trim();if(v==='-')v='-1';if(v==='')v='1';
+      const p=parseF(v);if(!p||!feq(p,sx))bad=true;}
+    if(ns.length>=2){const p=parseF(this.el.querySelector('#cn').value);if(!p||!feq(p,sn))bad=true;}
+    if(bad){this.miss('まとめる','計算がちがう。符号に気をつけて、もう一度。','.panel');this.render();return;}
+    const els=[...this.el.querySelectorAll(`.eqrow .it[data-s="${this.comb}"]`)],gs={x:[],n:[]};els.forEach(e=>{const t=l[+e.dataset.i];if(t)(t.x?gs.x:gs.n).push(e);});
+    const anchor={};['x','n'].forEach(k=>{if(gs[k].length)anchor[k]=gs[k][0].getBoundingClientRect();});
+    if(!RM){this.busy=true;const an=[];
+      ['x','n'].forEach(k=>{if(gs[k].length<2)return;const T=anchor[k];
+        gs[k].slice(1).forEach(e=>{const r=e.getBoundingClientRect();an.push(e.animate([{transform:'none'},{transform:`translate(${T.left-r.left}px,${T.top-r.top}px) scale(.5)`,opacity:.2}],{duration:420,easing:'ease-in',fill:'forwards'}).finished);});
+        gs[k][0].animate([{transform:'scale(1)'},{transform:'scale(1.25)'},{transform:'scale(1)'}],{duration:420});});
+      await Promise.all(an);this.busy=false;}
+    const dec=l.some(t=>t.dec);const nl=[];if(sx.n!==0)nl.push(TM(sx,1,dec));if(sn.n!==0)nl.push(TM(sn,0,dec));
+    this.pend.spawn={};nl.forEach(t=>{const k=t.x?'x':'n';if(anchor[k])this.pend.spawn[t.id]=anchor[k];});this.pend.glow=nl.map(t=>String(t.id));
+    if(this.comb==='L')this.L=nl;else this.R=nl;this.mode='normal';fx.ok();this.say('まとまった！');this.check();this.render();
+  }
+  check(init){
+    const lx=this.L.length===1&&this.L[0].t==='n'&&this.L[0].x,rn=this.R.length===0||(this.R.length===1&&this.R[0].t==='n'&&!this.R[0].x);
+    if(lx&&rn){if(fone(this.L[0].c)&&!init){this.mode='done';fx.clear();this.pend.confetti=true;this.o.onClear&&setTimeout(()=>this.o.onClear(),900);}else{this.mode='final';this.showHint=false;}}
+  }
+}
+
+/* ===== 文章題ランナー ===== */
+const R_=(x,y,w,h,c='bx')=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" class="${c}" rx="3"/>`;
+const T_=(x,y,s,c='')=>`<text x="${x}" y="${y}" class="${c}" text-anchor="middle">${s}</text>`;
+const L_=(a,b,c,d,cl='ln2')=>`<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" class="${cl}"/>`;
+const plain=s=>s.replace(/-/g,'−').replace(/\//g,'÷');
+
+class Word{
+  constructor(el,w,o={}){this.el=el;this.w=w;this.o=o;this.ph=0;this.pend={};this.busy=false;this.drawn=false;this.filled={};this.selChip=null;this.selSlot=null;this.box=[];this.msg='';this.render();}
+  render(){
+    const w=this.w;const names=['図をうめる','式をつくる','解く','答える'];
+    let h=`<div class="wsteps">${names.map((n,i)=>`<span class="${i===this.ph?'on':i<this.ph?'ok':''}">${i+1} ${n}</span>`).join('')}</div>`;
+    h+=`<p class="story">${w.story}</p>`;
+    // 図
+    let svg=w.svg;w.slots.forEach((s,i)=>{const f=this.filled[i];
+      svg+=`<g class="slot ${f?'filled':''} ${this.selSlot===i?'sel':''}" data-slot="${i}"><rect x="${s.x}" y="${s.y}" width="${s.w}" height="${s.h}" rx="4"/>${T_(s.x+s.w/2,s.y+s.h/2+5,f?plain(s.a):'？')}</g>`;});
+    h+=`<svg class="dg" viewBox="0 0 600 ${w.h}" role="img" aria-label="${w.title}の図">${svg}</svg>`;
+    if(this.ph===0){
+      h+=`<p class="muted" style="margin:0">式のカードを選んで、図の「？」をタップしてうめよう。</p><div class="pool">${w.chips.map((c,i)=>{const used=Object.values(this.filled).includes(c)&&w.slots.filter(s=>s.a===c).length<=Object.values(this.filled).filter(v=>v===c).length;
+        return`<button class="pc ${this.selChip===i?'sel':''} ${used?'used':''}" data-c="${i}" ${used?'disabled':''}>${exprH(c)}</button>`;}).join('')}</div>`;
+    }else if(this.ph===1){
+      const e=w.eqs;
+      h+=`<p class="muted" style="margin:0">${e.prop?'図から比例式をつくろう。カードを1つ選ぶ。':'同じものを2通りで表したのはどれとどれ？ カードを2つ選んで「＝」でつなごう。'}</p>`;
+      if(e.prop)h+=`<div class="builder"><div class="box ${this.box[0]!=null?'f':''}" data-b="0">${this.box[0]!=null?exprH(e.chips[this.box[0]]):'？'}</div></div>`;
+      else h+=`<div class="builder"><div class="box ${this.box[0]!=null?'f':''}" data-b="0">${this.box[0]!=null?exprH(e.chips[this.box[0]]):'？'}</div><span class="beq">＝</span><div class="box ${this.box[1]!=null?'f':''}" data-b="1">${this.box[1]!=null?exprH(e.chips[this.box[1]]):'？'}</div></div>`;
+      h+=`<div class="pool">${e.chips.map((c,i)=>`<button class="pc ${this.box.includes(i)?'used':''}" data-e="${i}" ${this.box.includes(i)?'disabled':''}>${exprH(c)}</button>`).join('')}</div>`;
+      if(e.tip)h+=`<p class="muted" style="font-size:15px">${md(e.tip)}</p>`;
+    }else if(this.ph===2){
+      h+=`<div id="weng"></div>`;
+    }else if(this.ph===3){
+      h+=`<div class="panel"><div>${w.ansQ}</div><div class="opts">${shuffle(w.ansOpts.map((o,i)=>[o,i])).map(([o,i])=>`<button class="opt txt" data-ans="${i}">${md(o)}</button>`).join('')}</div></div>`;
+    }else{
+      h+=`<div class="clearbox pop"><b>クリア！</b><div>${md(w.why)}</div></div>`;
+    }
+    h+=`<div class="fb ${this.msgCls||''}" aria-live="polite">${this.msg}</div>`;
+    this.el.innerHTML=h;this.bind();this.afterR();
+    if(this.ph===2){new Engine(this.el.querySelector('#weng'),w.eq,{onMiss:this.o.onMiss,doneText:'方程式が解けた。でも、まだ終わりじゃない。',onClear:()=>{this.ph=3;this.msg='';this.render();}});}
+  }
+  afterR(){
+    const p=this.pend;this.pend={};
+    if(p.shake)shake(this.el.querySelector(p.shake));
+    if(p.confetti)confetti();
+    if(RM)return;
+    const svg=this.el.querySelector('svg.dg');if(svg&&!this.drawn){this.drawn=true;drawIn(svg);}
+    if(p.filled!=null){const g=this.el.querySelector(`[data-slot="${p.filled}"]`);if(g){g.style.transformBox='fill-box';g.style.transformOrigin='center';
+      g.animate([{transform:'scale(1.45)'},{transform:'scale(1)'}],{duration:450,easing:'cubic-bezier(.34,1.56,.64,1)'});}}
+    if(p.boxEnter!=null){const b=this.el.querySelector(`[data-b="${p.boxEnter}"]`);b&&b.animate([{transform:'scale(.6)',opacity:.3},{transform:'none',opacity:1}],{duration:300,easing:'cubic-bezier(.34,1.56,.64,1)'});}
+    if(p.slam){const b0=this.el.querySelector('[data-b="0"]'),b1=this.el.querySelector('[data-b="1"]'),eq=this.el.querySelector('.beq');
+      b0&&b0.animate([{transform:'none'},{transform:'translateX(16px)'},{transform:'none'}],{duration:380});
+      b1&&b1.animate([{transform:'none'},{transform:'translateX(-16px)'},{transform:'none'}],{duration:380});
+      eq&&eq.animate([{transform:'scale(1)'},{transform:'scale(2)',color:cv('--red')},{transform:'scale(1)'}],{duration:500,delay:150});
+      const bl=this.el.querySelector('.builder');if(bl){const c=ctr(bl.getBoundingClientRect());burst(c.x,c.y,cv('--ok'),14,70);}}
+    if(p.enter){const t=this.el.querySelector(p.enter);t&&t.animate([{transform:'translateY(16px)',opacity:0},{transform:'none',opacity:1}],{duration:400,easing:'ease-out'});}
+  }
+  bind(){
+    const q=s=>this.el.querySelectorAll(s);
+    q('[data-c]').forEach(b=>b.onclick=()=>{this.selChip=+b.dataset.c;this.tryFill();});
+    q('[data-slot]').forEach(g=>g.onclick=()=>{const i=+g.dataset.slot;if(this.filled[i])return;this.selSlot=i;this.tryFill();});
+    q('[data-e]').forEach(b=>b.onclick=()=>{const i=+b.dataset.e;const n=this.w.eqs.prop?1:2;const k=[...Array(n).keys()].find(j=>this.box[j]==null);
+      if(k==null)return;this.box[k]=i;fx.ok();this.pend.boxEnter=k;if([...Array(n).keys()].every(j=>this.box[j]!=null))this.checkEq();else this.render();});
+    q('[data-b]').forEach(b=>b.onclick=()=>{this.box[+b.dataset.b]=null;this.render();});
+    q('[data-ans]').forEach(b=>b.onclick=()=>{if(b.dataset.ans==='0'){this.ph=4;fx.win();this.msg='';this.pend.confetti=true;this.render();this.o.onClear&&this.o.onClear();}
+      else{fx.ng();shake(b);b.disabled=true;this.o.onMiss&&this.o.onMiss('解き切る');S.miss['解き切る']=(S.miss['解き切る']||0)+1;save();
+        const fb=this.el.querySelector('.fb');fb.className='fb ng';fb.innerHTML=md(this.w.why);}});
+  }
+  async tryFill(){
+    if(this.busy)return;
+    if(this.selChip==null){this.render();return;}
+    if(this.selSlot==null){this.render();return;}
+    const s=this.w.slots[this.selSlot],c=this.w.chips[this.selChip],si=this.selSlot,ci=this.selChip;
+    if(c===s.a){
+      const ce=this.el.querySelector(`.pc[data-c="${ci}"]`),se=this.el.querySelector(`[data-slot="${si}"]`);
+      if(ce&&se){this.busy=true;await shot(ce.getBoundingClientRect(),se.getBoundingClientRect(),ce.innerHTML,'fxtok chipfly',380);this.busy=false;
+        const cc=ctr(se.getBoundingClientRect());burst(cc.x,cc.y,cv('--ok'),10,40);}
+      this.filled[si]=c;fx.ok();this.msg='';this.pend.filled=si;
+      if(this.w.slots.every((_,i)=>this.filled[i])){this.msg='図ができた！';this.msgCls='ok';fx.clear();
+        setTimeout(()=>{this.ph=1;this.msg='';this.pend.enter='.builder';this.render();},900);}}
+    else{fx.ng();this.msg=s.tip?md(s.tip):'そこには入らない。図の位置と問題文をくらべよう。';this.msgCls='ng';this.o.onMiss&&this.o.onMiss();this.pend.shake=`[data-slot="${si}"]`;}
+    this.selChip=null;this.selSlot=null;this.render();
+  }
+  checkEq(){
+    const e=this.w.eqs;let ok;
+    if(e.prop)ok=e.chips[this.box[0]]===e.ans[0];
+    else{const a=[e.chips[this.box[0]],e.chips[this.box[1]]];ok=(a[0]===e.ans[0]&&a[1]===e.ans[1])||(a[0]===e.ans[1]&&a[1]===e.ans[0]);}
+    if(ok){fx.clear();this.msg='式ができた！';this.msgCls='ok';this.pend.slam=true;this.render();setTimeout(()=>{this.ph=2;this.msg='';this.render();},1000);}
+    else{fx.ng();this.msg=md(e.ng||'その2つは同じものを表していない。図をもう一度見よう。');this.msgCls='ng';this.box=[];this.o.onMiss&&this.o.onMiss();this.pend.shake='.builder';this.render();}
+  }
+}
+
+/* ===== 文章題データ（数はワークと変えてある） ===== */
+const W={
+ dai:{title:'代金の問題',story:'みかん15個を、120円の箱に入れて買ったら、代金の合計は1320円でした。みかん1個の値段を x 円として、みかん1個の値段を求めなさい。',h:120,
+  svg:R_(20,20,400,44,'bxf')+R_(420,20,160,44)+T_(220,90,'みかん15個の代金')+T_(500,90,'箱の代金')+L_(20,100,580,100,'ar')+T_(300,116,'合計','r'),
+  slots:[{x:150,y:26,w:140,h:32,a:'15x'},{x:445,y:26,w:110,h:32,a:'120'},{x:330,y:96,w:110,h:24,a:'1320',tip:'合計はいくら？'}],
+  chips:['15x','15+x','120','1320','x'],
+  eqs:{chips:['15x+120','1320','15x','120+1320'],ans:['15x+120','1320']},eq:'15x+120=1320',
+  ansQ:'方程式の答えは x=80。問題の答えの書き方は？',ansOpts:['80円','80','x=80'],why:'「値段は？」と聞かれているので、単位「円」まで書いて解き切る。'},
+ kafu:{title:'過不足の問題',story:'クラスで記念品を買います。1人60円ずつ集めると300円たりず、1人80円ずつ集めると200円余ります。クラスの人数を x 人として、人数を求めなさい。',h:190,
+  svg:T_(420,18,'記念品の代金','r')+L_(420,24,420,180,'ds')+R_(20,34,320,40,'bxf')+`<rect x="340" y="34" width="80" height="40" class="ds" rx="3"/>`+T_(380,92,'たりない','r')+
+     R_(20,114,480,40,'bxf')+L_(420,166,500,166,'ds')+T_(540,170,'余り','r'),
+  slots:[{x:110,y:40,w:140,h:28,a:'60x'},{x:345,y:40,w:70,h:28,a:'300'},{x:190,y:120,w:140,h:28,a:'80x'},{x:510,y:120,w:70,h:28,a:'200'}],
+  chips:['60x','80x','300','200','60+x','x+80'],
+  eqs:{chips:['60x+300','80x-200','60x-300','80x+200'],ans:['60x+300','80x-200'],tip:'どちらも「記念品の代金」を表している式を選ぶ。',ng:'たりないときは、集めたお金に たす と代金になる。余るときは ひく と代金。'},
+  eq:'60x+300=80x-200',ansQ:'x=25。答えの書き方は？',ansOpts:['25人','25','x=25'],why:'「何人？」なので「人」まで書く。'},
+ oi:{title:'追いつく問題',story:'弟が分速60mで家を出発しました。その10分後に、兄が分速180mで同じ道を追いかけました。兄が出発してから x 分後に追いつくとして、何分後か求めなさい。',h:150,
+  svg:T_(40,20,'家','k')+L_(40,28,40,140,'ar')+L_(40,58,520,58,'ar')+T_(500,20,'追いつく','r')+L_(520,28,520,140,'ds')+
+     T_(110,48,'弟 分速60m')+T_(110,128,'兄 分速180m')+L_(40,108,520,108,'ar'),
+  slots:[{x:200,y:30,w:110,h:24,a:'x+10',tip:'弟は兄より10分長く歩いている。'},{x:360,y:66,w:130,h:26,a:'60(x+10)'},{x:360,y:116,w:130,h:26,a:'180x'}],
+  chips:['x+10','x-10','60(x+10)','60x+10','180x','180+x'],
+  eqs:{chips:['180x','60(x+10)','60x+10','x+10'],ans:['180x','60(x+10)'],tip:'追いついたとき、2人の進んだ道のりは同じ。'},
+  eq:'180x=60(x+10)',ansQ:'x=5。答えの書き方は？',ansOpts:['5分後','5','5m'],why:'「何分後？」と聞かれている。'},
+ michi:{title:'道のりと時間の差',story:'家から図書館まで、分速60mで歩くのと、分速240mで自転車で行くのとでは、かかる時間が15分ちがいます。道のりを x m として求めなさい。',h:140,
+  svg:R_(20,20,480,40,'bxf')+T_(70,46,'歩く','k')+R_(20,80,150,40)+T_(60,106,'自転車')+`<rect x="170" y="80" width="330" height="40" class="ds" rx="3"/>`+T_(240,106,'ちがい','r'),
+  slots:[{x:200,y:26,w:130,h:28,a:'x/60',tip:'時間＝道のり÷速さ。歩く速さは分速60m。'},{x:100,y:86,w:66,h:28,a:'x/240'},{x:330,y:86,w:90,h:28,a:'15'}],
+  chips:['x/60','60x','x/240','240x','15'],
+  eqs:{chips:['x/60-x/240','x/240-x/60','15','60x-240x'],ans:['x/60-x/240','15'],tip:'時間が長いのは、おそい「歩く」ほう。（長い）−（短い）＝ちがい。'},
+  eq:'x/60-x/240=15',ansQ:'x=1200。答えの書き方は？',ansOpts:['1200m','1200','20分'],why:'聞かれているのは道のり。単位は m。'},
+ sei:{title:'続いた整数',story:'3つの続いた整数があります。いちばん小さい数を7倍すると、残りの2つの数の和の3倍と等しくなります。いちばん小さい数を x として、3つの整数を求めなさい。',h:130,
+  svg:R_(40,14,140,40,'bxf')+T_(110,40,'x','k')+R_(230,14,140,40)+R_(420,14,140,40)+T_(395,96,'残り2つの和')+L_(230,70,560,70,'ar'),
+  slots:[{x:250,y:20,w:100,h:28,a:'x+1'},{x:440,y:20,w:100,h:28,a:'x+2'},{x:330,y:100,w:130,h:26,a:'2x+3'}],
+  chips:['x+1','x+2','2x+3','2x','3x'],
+  eqs:{chips:['7x','3(2x+3)','3(x+1)+(x+2)','7(x+1)'],ans:['7x','3(2x+3)'],ng:'「和の3倍」は、和 (2x+3) 全体に3をかける。かっこが必要。'},
+  eq:'7x=3(2x+3)',ansQ:'x=9。答えの書き方は？',ansOpts:['9、10、11','9','x=9'],why:'聞かれているのは「3つの整数」。x を出して終わりにせず、3つ全部書く。'},
+ hi:{title:'比で分ける',story:'1.2Lのお茶を、AとBの量の比が3:1になるように分けました。Aを x mL として、Aに入ったお茶の量を求めなさい。',h:120,
+  svg:[0,1,2,3].map(k=>R_(20+k*140,20,140,44,k<3?'bxf':'bx')).join('')+T_(230,82,'A（3）','k')+T_(510,82,'B（1）')+L_(20,94,580,94,'ar'),
+  slots:[{x:160,y:26,w:140,h:32,a:'x'},{x:440,y:26,w:140,h:32,a:'1200-x',tip:'全部から A をひいた残りが B。'},{x:240,y:98,w:120,h:22,a:'1200',tip:'1.2L を mL になおすと？'}],
+  chips:['x','1200-x','1.2-x','1200','1.2'],
+  eqs:{prop:true,chips:['x:(1200-x)=3:1','x:1200=3:1','(1200-x):x=3:1'],ans:['x:(1200-x)=3:1'],ng:'A:B=3:1 の順番どおりに。A は x、B は 1200−x。'},
+  eq:'x:(1200-x)=3:1',ansQ:'x=900。答えの書き方は？',ansOpts:['900mL','900','0.9mL'],why:'単位は mL。1.2L を mL になおしてから式をつくった。'},
+ minus:{title:'答えがマイナスのとき',story:'水そうAには30L、Bには12Lの水が入っています。両方に毎分1Lずつ水を入れます。x 分後にAの水の量がBの3倍になるとして、方程式をつくり、どんなことがいえるか考えなさい。',h:160,
+  svg:R_(60,20,110,130)+`<rect x="60" y="64" width="110" height="86" class="bxf" rx="3"/>`+T_(115,52,'A','k')+
+     R_(320,20,110,130)+`<rect x="320" y="118" width="110" height="32" class="bxf" rx="3"/>`+T_(375,52,'B','k')+T_(520,44,'毎分 1L ずつ','r'),
+  slots:[{x:70,y:94,w:90,h:28,a:'30+x',tip:'はじめ30L、x 分で x L ふえる。'},{x:330,y:82,w:90,h:28,a:'12+x'}],
+  chips:['30+x','12+x','30x','12x','30'],
+  eqs:{chips:['30+x','3(12+x)','3×12+x','12+x'],ans:['30+x','3(12+x)'],ng:'「Bの3倍」は B 全体 (12+x) に3をかける。'},
+  eq:'30+x=3(12+x)',ansQ:'x=−3。ここからいえることは？',ansOpts:['3分前に、AはBの3倍だった。これから先、3倍になることはない。','3分後に、AはBの3倍になる。','答えがマイナスなので、計算がまちがっている。'],
+  why:'「x分後」の x がマイナスなら「前」のこと。−3分後＝3分前。p.75⑦も同じ型。'},
+ kugi:{title:'比例式の利用',story:'同じくぎ20本の重さは50gでした。箱のくぎ全部の重さは600gです。くぎを全部で x 本として求めなさい。',h:120,
+  svg:R_(150,10,300,100)+L_(300,10,300,110,'bx')+L_(150,60,450,60,'bx')+T_(225,42,'20本','k')+T_(375,42,'50g','k'),
+  slots:[{x:175,y:68,w:100,h:30,a:'x'},{x:325,y:68,w:100,h:30,a:'600'}],chips:['x','600','50','20'],
+  eqs:{prop:true,chips:['20:50=x:600','20:600=x:50','50:20=x:600'],ans:['20:50=x:600'],ng:'左も右も「本数:重さ」の順にそろえる。'},
+  eq:'20:50=x:600',ansQ:'x=240。答えの書き方は？',ansOpts:['240本','240','240g'],why:'聞かれているのは本数。'},
+ ringo:{title:'りんごと袋（入試の形）',story:'袋にりんごを5個ずつ入れると、りんごが3個と袋が3袋余ります。4個ずつ入れると、りんごも袋も余りません。りんごを x 個として、個数を求めなさい。',h:150,
+  svg:[0,1,2,3].map(k=>R_(20+k*58,20,48,48,'bxf')+T_(44+k*58,50,'5個','k')).join('')+[0,1,2].map(k=>R_(270+k*54,20,44,48)).join('')+T_(560,50,'りんご3個','r')+
+     T_(130,90,'りんごの入った袋')+T_(330,90,'空の袋','r')+L_(20,104,430,104,'ar')+T_(120,140,'袋は全部で')+T_(390,140,'4個ずつなら'),
+  slots:[{x:180,y:120,w:150,h:28,a:'(x-3)/5+3',tip:'入った袋 (x−3)÷5 と、空の袋 3 をたす。'},{x:450,y:120,w:120,h:28,a:'x/4'}],
+  chips:['(x-3)/5+3','(x+3)/5-3','x/4','4x','5x+3'],
+  eqs:{chips:['(x-3)/5+3','x/4','(x-3)/5','4x'],ans:['(x-3)/5+3','x/4'],tip:'りんごの数は同じ。袋の数も同じ。袋の数を2通りで表している。'},
+  eq:'(x-3)/5+3=x/4',ansQ:'x=48。答えの書き方は？',ansOpts:['48個','48','12袋'],why:'聞かれているのはりんごの個数。p.76⑥も同じ型。'}
+};
+
+/* ===== 4章 ポイント ===== */
+const P4={
+ heniki:{name:'変域は、はしの数をふくむか見る',rule:'「以上」「以下」は ≦（数直線は●）。「未満」「より大きい」「より小さい」は <（数直線は○）。両はしがあるときは両方書く。',
+  bad:['0以上6以下','x≦6'],bx:1,note:'左はしの 0 がぬけている。両はしを書く。',good:['0以上6以下','0≦x≦6'],gh:1,
+  quiz:['3以上18未満','3≦x≦18'],w:1,why:'18未満は 18 をふくまない。3≦x<18。'},
+ hirei:{name:'比例の式は y=ax に代入する',rule:'y が左、x が右。y=a×x に代入して a を求める。a=y÷x。',
+  bad:['x=9 のとき y=3','9=a×3','a=3'],bx:1,note:'x と y が逆。y=a×x だから 3=a×9。',good:['x=9 のとき y=3','3=a×9','a=[1|3]','y=[1|3]x'],gh:1,
+  quiz:['x=−3 のとき y=18','18=a×(−3)','a=6'],w:2,why:'18÷(−3)=−6。y=−6x。'},
+ zahyo:{name:'座標は (x, y) の順',rule:'原点Oから、まず横に x（右がプラス、左がマイナス）、次にたてに y（上がプラス、下がマイナス）。',
+  bad:['右へ3、上へ5 の点','(5, 3)'],bx:1,note:'y を先に書いている。',good:['右へ3、上へ5 の点','(3, 5)'],gh:1,
+  quiz:['左へ4、下へ2 の点','(−4, 2)'],w:1,why:'下へ2 は y=−2。(−4, −2)。'},
+ hgraph:{name:'比例のグラフは原点を通る直線',rule:'原点と、もう1点をとって結ぶ。a が分数 [3|5] なら x=5 のとき y=3 の点を使うと、方眼にのる。',
+  bad:['y=[3|5]x','点 (1, [3|5]) をとる'],bx:1,note:'方眼の交わるところにのらない点はとりにくい。',good:['y=[3|5]x','x=5 のとき y=3','(5, 3) と原点を結ぶ'],gh:1,
+  quiz:['y=−2x のグラフ','(1, 2) を通る'],w:1,why:'x=1 のとき y=−2。(1, −2) を通る。'},
+ han:{name:'反比例は a = xy（かけ算）',rule:'y=[a|x] なら、x と y をかけると比例定数 a。わり算にしない。',
+  bad:['x=5 のとき y=2','a=[5|2]'],bx:1,note:'反比例はかけ算。a=5×2=10。',good:['x=5 のとき y=2','a=5×2=10','y=[10|x]'],gh:1,
+  quiz:['x=−4 のとき y=[3|4]','a=−4×[3|4]','a=3'],w:2,why:'−4×[3|4]=−3。y=−[3|x]。'},
+ hyp:{name:'反比例のグラフは、なめらかな2本の曲線',rule:'表の点をとって、なめらかな曲線で結ぶ（双曲線）。a が正なら右上と左下、負なら左上と右下。軸にはつかない。',
+  bad:['y=[6|x] の点をとる','点を折れ線で結ぶ'],bx:1,note:'反比例のグラフは曲線。軸とはまじわらない。',good:['y=[6|x] の点をとる','なめらかな曲線で結ぶ','2本で1組'],gh:1},
+ riyo:{name:'まず、比例か反比例かを見分ける',rule:'x が2倍、3倍…で y も2倍、3倍…なら比例（y=ax）。y が[1|2]倍、[1|3]倍…なら反比例（y=[a|x]）。',
+  bad:['4人で6日かかる','8人なら12日'],bx:1,note:'人がふえると日数はへる。反比例。',good:['4人で6日（xy=24）','8人なら 24÷8=3日'],gh:1}
+};
+/* ===== ステージ（数はワークと変えてある） ===== */
+const ST4=[
+ {id:'s1',sk:'heniki',name:'変域と関数',sub:'不等号と数直線・関数マシン',pt:'heniki',acts:[
+   {t:'ineq',title:'変域 1',d:{t:'0以上6以下',lo:0,loI:true,hi:6,hiI:true}},
+   {t:'ineq',title:'変域 2',d:{t:'3以上18未満',lo:3,loI:true,hi:18,hiI:false}},
+   {t:'ineq',title:'変域 3',d:{t:'−1未満',v:-1,vI:false,dir:'L'}},
+   {t:'ineq',title:'変域 4',d:{t:'3より大きい',v:3,vI:false,dir:'R'}},
+   {t:'func',title:'関数 1',d:{t:'1辺が x cm の正方形の面積を y cm²',demo:[[1,[1]],[2,[4]],[3,[9]]],ans:true,why:'1辺を決めると面積はただ1つに決まる。だから関数。'}},
+   {t:'func',title:'関数 2',d:{t:'自然数 x の倍数を y',demo:[[2,[2,4,6,'…']],[3,[3,6,9,'…']]],ans:false,why:'x=2 のとき y は 2、4、6…といくつもある。1つに決まらないので関数ではない。'}},
+   {t:'func',title:'関数 3',d:{t:'40ページの問題集を x ページ解いたときの残りを y ページ',demo:[[10,[30]],[25,[15]]],ans:true,why:'解いたページ数を決めると残りはただ1つ。関数。'}}],
+  paper:['ワーク p.78 ①②（変域の直し）','ワーク p.79 ①②③④・C']},
+ {id:'s2',sk:'hfind',name:'比例の式',sub:'y=ax に代入して a を求める',pt:'hirei',acts:[
+   {t:'find',title:'1',d:{k:'hi',x:'2',y:'-10'}},
+   {t:'find',title:'2',d:{k:'hi',x:'-3',y:'18',ask:{x:'4'}}},
+   {t:'find',title:'3',d:{k:'hi',x:'9',y:'3',ask:{y:'2'}}},
+   {t:'find',title:'4',d:{k:'hi',x:'-2',y:'14',ask:{y:'21'}}},
+   {t:'word',title:'表から',d:{story:'次の表は、y が x に比例する関係です。',xl:'x',yl:'y',xs:['1','2','3','4'],ys:['-3','-6','-9','-12'],kind:'hi',a:'-3',steps:['kind','a'],why:'y=−3x。x が2倍で y も2倍。'}}],
+  paper:['ワーク p.80 ①②（②の直し）','ワーク p.81 ①②③・C','家用プリント：p.80 ②(2)①②']},
+ {id:'s3',sk:'zahyo',name:'座標',sub:'(x, y)。x が先、y があと',pt:'zahyo',acts:[
+   {t:'plot',title:'点をとる 1',d:{mode:'plot',pts:[['A',4,2],['B',-3,5],['C',0,-4]]}},
+   {t:'plot',title:'点をとる 2',d:{mode:'plot',pts:[['D',-5,-2],['E',3,-3],['F',-2,0]]}},
+   {t:'plot',title:'座標を読む 1',d:{mode:'read',pts:[['A',2,3],['B',-4,1],['C',-2,-5]]}},
+   {t:'plot',title:'座標を読む 2',d:{mode:'read',pts:[['D',5,-2],['E',0,4],['F',-3,0]]}}],
+  paper:['ワーク p.82 ①②③','ワーク p.83 ①②・C']},
+ {id:'s4',sk:'hgraph',name:'比例のグラフ',sub:'原点を通る直線',pt:'hgraph',acts:[
+   {t:'line',title:'かく 1',d:{a:'2'}},
+   {t:'line',title:'かく 2',d:{a:'-3'}},
+   {t:'line',title:'かく 3',d:{a:'3/4'}},
+   {t:'line',title:'かく 4',d:{a:'-2/5'}},
+   {t:'line',title:'読む 1',d:{a:'-2/3',read:true}},
+   {t:'line',title:'読む 2',d:{a:'5/2',read:true}}],
+  paper:['ワーク p.84 ①②','ワーク p.85 ①②・C']},
+ {id:'s5',sk:'hanfind',name:'反比例の式',sub:'a = xy（かけ算）',pt:'han',acts:[
+   {t:'find',title:'1',d:{k:'han',x:'5',y:'2'}},
+   {t:'find',title:'2',d:{k:'han',x:'3',y:'12',ask:{x:'-4'}}},
+   {t:'find',title:'3',d:{k:'han',x:'-4',y:'3/4',ask:{y:'-1'}}},
+   {t:'find',title:'4',d:{k:'han',x:'2',y:'-16',ask:{y:'-8'}}},
+   {t:'word',title:'表から',d:{story:'次の表は比例？ 反比例？',xl:'x',yl:'y',xs:['-2','-1','1','2'],ys:['-9','-18','18','9'],kind:'han',a:'18',steps:['kind','a'],why:'x と y の積がいつも 18。y=[18|x]。'}}],
+  paper:['ワーク p.86 ①②','ワーク p.87 ①②③・C','ワーク p.90〜91 ドリル']},
+ {id:'s6',sk:'hantbl',name:'反比例のグラフ',sub:'なめらかな2本の曲線',pt:'hyp',acts:[
+   {t:'hyper',title:'かく 1',d:{a:6,xs:[-6,-3,-2,-1,1,2,3,6]}},
+   {t:'hyper',title:'かく 2',d:{a:-4,xs:[-4,-2,-1,1,2,4]}},
+   {t:'hyper',title:'読む',d:{read:true,a:12,pt:[3,4],check:['1.5','8']}}],
+  paper:['ワーク p.88 ①②','ワーク p.89 ①②③・C']},
+ {id:'s7',sk:'miwake',name:'比例と反比例の利用',sub:'見分けて、式にして、答える',pt:'riyo',acts:[
+   {t:'word',title:'針金',d:{story:'同じ針金 20cm の重さは 5g でした。針金の長さを x cm、重さを y g とします。重さが 30g のとき、長さは何 cm？',xl:'長さ x (cm)',yl:'重さ y (g)',xs:['20','40','60'],ys:['5','10','15'],kind:'hi',a:'1/4',askQ:'y=30 のとき x =',askA:'120',steps:['kind','a','ask','unit'],unit:['120cm','120g','30cm'],why:'比例。重さが6倍なら長さも6倍。'}},
+   {t:'word',title:'電子レンジ',d:{story:'弁当を温める時間は出力に反比例します。600W で 120秒です。出力を x W、時間を y 秒とします。800W なら何秒？',xl:'出力 x (W)',yl:'時間 y (秒)',xs:['600','1200','1800'],ys:['120','60','40'],kind:'han',a:'72000',askQ:'x=800 のとき y =',askA:'90',steps:['kind','a','ask','unit'],unit:['90秒（1分30秒）','90分','90W'],why:'反比例。出力が大きいほど時間は短い。'}},
+   {t:'word',title:'ペンキぬり',d:{story:'フェンスをぬるのに 3人で 8日かかりました。人数を x 人、日数を y 日とします。4人なら何日？',xl:'人数 x (人)',yl:'日数 y (日)',xs:['3','6','12'],ys:['8','4','2'],kind:'han',a:'24',askQ:'x=4 のとき y =',askA:'6',steps:['kind','a','ask','unit'],unit:['6日','6人','24日'],why:'人数×日数＝24 で一定。反比例。'}},
+   {t:'word',title:'牛乳パック',d:{story:'トイレットペーパー 1個を作るのに牛乳パックが 5枚いります。ペーパーを x 個、パックを y 枚とします。パック 600枚で何個作れる？',xl:'ペーパー x (個)',yl:'パック y (枚)',xs:['1','2','3'],ys:['5','10','15'],kind:'hi',a:'5',askQ:'y=600 のとき x =',askA:'120',steps:['kind','a','ask','unit'],unit:['120個','120枚','3000個'],why:'比例。y=5x に y=600 を入れる。'}}],
+  paper:['ワーク p.92 ①②③','ワーク p.93 ①②・C','ワーク p.95 ⑦⑧']},
+ {id:'boss',sk:'miwake',sks:['heniki','hfind','hanfind','hgraph','hantbl','miwake'],name:'ボス：章末テスト',sub:'ここまでの全部をまぜた問題',boss:true,acts:[
+   {t:'ineq',title:'変域',d:{t:'−1以上8未満',lo:-1,loI:true,hi:8,hiI:false}},
+   {t:'find',title:'比例',d:{k:'hi',x:'6',y:'-9',ask:{x:'-4'}}},
+   {t:'find',title:'反比例',d:{k:'han',x:'-2',y:'8',ask:{x:'-4'}}},
+   {t:'line',title:'グラフ',d:{a:'-4/3',read:true}},
+   {t:'hyper',title:'双曲線',d:{read:true,a:-8,pt:[2,-4],check:['-4','2']}},
+   {t:'word',title:'水そう',d:{story:'水そうを満水にするのに、管1本では 48分かかります。管の本数を x 本、時間を y 分とします。4本なら何分？',xl:'本数 x (本)',yl:'時間 y (分)',xs:['1','2','3'],ys:['48','24','16'],kind:'han',a:'48',askQ:'x=4 のとき y =',askA:'12',steps:['kind','a','ask','unit'],unit:['12分','12本','192分'],why:'反比例。本数が4倍なら時間は[1|4]。'}}],
+  paper:['ワーク p.94〜95 基本問題でふり返ろう','ワーク p.96〜97 章末総合テスト','ワーク p.98〜99 入試問題']}
+];
+/* ===== 3章 ポイント ===== */
+const P3={
+ iko:{name:'移項したら、符号を変える',rule:'＝の反対側へ移した項は、＋は−に、−は＋に変わる。',
+  bad:['3x+14=26','3x=26+14','3x=40'],bx:1,note:'+14 を右へ移したのに、+のまま。',good:['3x+14=26','3x=26−14','3x=12','x=4'],gh:1,
+  quiz:['5x−7=2x+11','5x−2x=11−7','3x=4'],w:1,why:'−7 を右へ移すと +7。正しくは 3x=18 → x=6。'},
+ waru:{name:'最後のわり算は、右の数が分子',rule:'x =（右の数）÷（xの係数）。6x=4 なら x=[4|6]=[2|3]。分数のままでよい。−÷− は＋。',
+  bad:['6x=4','x=[6|4]'],bx:1,note:'分母と分子が逆。「6でわる」から 6 が分母。',good:['6x=4','x=[4|6]','x=[2|3]'],gh:1,
+  quiz:['2x−9=7x+26','2x−7x=26+9','−5x=35','x=7'],w:3,why:'35÷(−5) は −7。＋÷− は −。'},
+ kakko:{name:'かっこは「かけ算が先」、マイナスに注意',rule:'9−2(x−3) は、9−2 を先に計算しない。−2 をかっこの中の全部にかける。−2×(−3)=+6。',
+  bad:['9−2(x−3)=x','7(x−3)=x'],bx:1,note:'9−2 を先にまとめてしまった。p.74①(4) と同じミス。',good:['9−2(x−3)=x','9−2x+6=x','−3x=−15','x=5'],gh:1,
+  quiz:['x−3(2x−4)=17','x−6x−12=17','−5x=29'],w:1,why:'−3×(−4)=+12。正しくは x−6x+12=17 → x=−1。'},
+ bunsu:{name:'分母をはらうときは、全部の項にかける',rule:'分数でない項（右の 1 など）にもかける。分子はかっこをつけて残す。',
+  bad:['[x+1|3]−[x−2|6]=1','2(x+1)−x−2=1'],bx:1,note:'右の 1 に 6 をかけていない。−(x−2) のかっこもない。',good:['[x+1|3]−[x−2|6]=1','2(x+1)−(x−2)=6','2x+2−x+2=6','x=2'],gh:1,
+  quiz:['[1|2]x+3=2x','x+3=4x','−3x=−3'],w:1,why:'3 にも 2 をかける。正しくは x+6=4x → x=2。'},
+ shosu:{name:'小数とかっこは、先にかっこをはずす',rule:'0.4(0.5x−2) は、先に 0.2x−0.8 にする。それから全部の項を10倍。',
+  bad:['0.4(0.5x−2)=0.6','4(5x−2)=6'],bx:1,note:'外と中の両方を10倍すると左は100倍。右は 60 にしないとつり合わない。',good:['0.4(0.5x−2)=0.6','0.2x−0.8=0.6','2x−8=6','x=7'],gh:1,
+  quiz:['0.3x−0.12=0.06x+0.36','3x−12=6x+36'],w:1,why:'0.12 は10倍しても整数にならない。全部を100倍して 30x−12=6x+36。'},
+ hirei:{name:'比例式は「外どうし＝内どうし」',rule:'a:b=c:d なら ad=bc。式どうしをかけるときは、かっこをつける。',
+  bad:['(x+8):6=5:2','2x+8=30'],bx:1,note:'2 を x+8 の全部にかけていない。',good:['(x+8):6=5:2','2(x+8)=6×5','2x+16=30','x=7'],gh:1,
+  quiz:['x:(x+1)=4:9','9x=4x+1','5x=1'],w:1,why:'4(x+1)=4x+4。正しくは 5x=4 → x=[4|5]。'},
+ bun1:{name:'等しいものを見つけて、単位まで答える',rule:'①x を決める ②図にする ③同じものを2通りで表す → ＝ でつなぐ ④解く ⑤単位まで答える。',
+  bad:['60x+300=80x−200','x=25','（おわり）'],bx:2,note:'x を出したところで終わっている。答えは「25人」。',good:['x：クラスの人数','代金＝60x+300＝80x−200','x=25','答え 25人'],gh:3},
+ bun2:{name:'速さは、表か図で「時間」をそろえる',rule:'時間＝道のり÷速さ、道のり＝速さ×時間。先に出た人は、時間が長い。',
+  bad:['兄 x 分、弟 x 分','180x=60x'],bx:1,note:'弟は10分早く出ているので、時間は x+10。',good:['兄 x 分、弟 (x+10) 分','180x=60(x+10)','x=5','答え 5分後'],gh:0},
+ bun3:{name:'マイナスの答えは「前」のこと',rule:'「x 分後」「x 年後」で x がマイナスなら、それは「前」。それから先にはそうならない、と書く。',
+  bad:['x=−3','答え：−3分後'],bx:1,note:'−3分後のまま答えない。',good:['x=−3','3分前に、AはBの3倍だった。','これから先、3倍になることはない。'],gh:1}
+};
+
+/* ===== 3章 ステージ ===== */
+const ST3=[
+ {id:'s1',sk:'iko',name:'移項',sub:'項を＝の反対へ。符号が変わる',pt:'iko',probs:['6x+5=x+20','4x-5=6x+3','25-3x=2x'],
+  paper:['ワーク p.72 ③(1)(2)(6)(7)(8)(9)','家用プリント：p.68 A②(1)、p.69 B①(4)']},
+ {id:'s2',sk:'waru',name:'最後のわり算',sub:'x=（右の数）÷（xの係数）',pt:'waru',probs:['6x=4','2x-9=7x+26','7x-3=x+1','3/4x=-9'],
+  paper:['ワーク p.72 ①②','ワーク p.72 ③(3)(4)(5)','家用プリント：p.68 A①(2)(5)、p.69 B①(1)、p.70 ①(2)、p.71 ①(2)']},
+ {id:'s3',sk:'kakko',name:'かっこをはずす',sub:'かけ算が先・マイナスのかっこ',pt:'kakko',probs:['3(x-6)=2x-11','-3(x+2)=2(x-8)','4-3(x-2)=x+2','x-3(2x-4)=17'],
+  paper:['ワーク p.73 ④(1)(2)(3)','家用プリント：p.63 B①(1)(2)、p.70 ①(6)、p.74 ①(4)']},
+ {id:'s4',sk:'bunsu',name:'分母をはらう',sub:'全部の項に同じ数をかける',pt:'bunsu',probs:['(x+3)/4=-x+2','(3x-1)/4=(x+1)/2','x-(x+5)/3=1','1/2x+4=3x'],
+  paper:['ワーク p.73 ⑤(1)(2)','家用プリント：p.63 B②(1)(4)、p.71 ①(4)(6)']},
+ {id:'s5',sk:'shosu',name:'小数',sub:'先にかっこ、全部を10倍・100倍',pt:'shosu',probs:['0.4(0.5x-2)=0.6','0.2x+0.36=0.05x-0.09','0.3(x-2)=0.6x+0.3'],
+  paper:['ワーク p.74 ①(5)(6) を見直す','家用プリント：p.74 ①(6)']},
+ {id:'s6',sk:'hireishiki',name:'比例式',sub:'外どうし＝内どうし',pt:'hirei',probs:['5:x=10:4','x:(x+3)=2:5','(x+4):3=x:2','1/4:1/3=12:x'],
+  paper:['ワーク p.73 ⑧(1)(2)','ワーク p.74 ②(1)(2)','家用プリント：p.71 ②(1)']},
+ {id:'s7',sk:'bunshou',name:'文章題 1',sub:'代金・過不足',pt:'bun1',words:['dai','kafu'],paper:['ワーク p.73 ⑥⑦','家用プリント：p.67 C(3)']},
+ {id:'s8',sk:'bunshou',name:'文章題 2',sub:'追いつく・道のりと時間',pt:'bun2',words:['oi','michi'],paper:['ワーク p.75 ⑤']},
+ {id:'s9',sk:'bunshou',name:'文章題 3',sub:'比・整数・マイナスの答え',pt:'bun3',words:['hi','kugi','sei','minus'],paper:['ワーク p.75 ④⑥⑦','家用プリント：p.67 B③(1)(2)、p.69 C']},
+ {id:'boss',sk:'bunsu',sks:['kakko','bunsu','bunsu','bunsu','bunshou'],name:'ボス：章末テスト',sub:'ここまでの全部をまぜた問題',boss:true,
+  probs:['120-30(x+2)=150','5/6x+1/3=x/2-1','x-(x-1)/3=3','(x+2)/3=-(x-3)/2'],words:['ringo'],
+  paper:['ワーク p.74 ①(7)〜(10)、③','ワーク p.76 ①〜⑥','（チャレンジ）ワーク p.77 ⑦']}
+];
+/* ===== 章（3章・4章を1つに） ===== */
+ST3.forEach(s=>{s.id='c3-'+s.id;s.acts=(s.probs||[]).map((q,i)=>({t:'eq',title:String(i+1),d:{s:q}})).concat((s.words||[]).map(w=>({t:'w',title:W[w].title,d:{w}})));
+  s.acts.forEach((a,i)=>a.sk=(s.sks&&s.sks[i])||s.sk);});
+ST4.forEach(s=>{s.id='c4-'+s.id;s.acts.forEach((a,i)=>a.sk=(s.sks&&s.sks[i])||(a.t==='word'&&s.sk!=='miwake'&&!s.boss?'miwake':s.sk));});
+const CH={
+ c3:{id:'c3',name:'3章 方程式',pages:'ワーク p.62〜77',unit:'方程式',stages:ST3,P:P3},
+ c4:{id:'c4',name:'4章 比例と反比例',pages:'ワーク p.78〜99',unit:'比例と反比例',stages:ST4,P:P4}
+};
+let CUR=CH.c4,STAGES=CUR.stages,P=CUR.P;
+function useCh(c){CUR=CH[c]||CH.c4;STAGES=CUR.stages;P=CUR.P;S.ch=CUR.id;}
+const items=st=>st.acts;
+const stDone=st=>{const r=stS(st.id);return items(st).every((_,i)=>r.done[i]);};
+const paperDone=st=>{const r=stS(st.id);return st.paper.every((_,i)=>r.paper[i]);};
+const cleared=st=>stDone(st)&&paperDone(st);
+const nextIdx=()=>{const i=STAGES.findIndex(s=>!cleared(s));return i<0?STAGES.length-1:i;};
+class EqAct{constructor(el,d,o){return new Engine(el,d.s,o);}}
+class WAct{constructor(el,d,o){return new Word(el,d.word||W[d.w],o);}}
+ACT.eq=EqAct;ACT.w=WAct;
+
+/* ===== 前の2つのアプリの進み具合を引きつぐ（同じサイトにあるとき） ===== */
+(function(){
+  if(S.migrated)return;S.migrated=1;
+  [['houteishiki-work-support-v2','c3-'],['hirei-hanpirei-support-v1','c4-']].forEach(([k,pre])=>{
+    try{const o=JSON.parse(localStorage.getItem(k)||'null');if(!o)return;
+      Object.entries(o.st||{}).forEach(([id,v])=>{if(!S.st[pre+id])S.st[pre+id]=v;});
+      Object.entries(o.miss||{}).forEach(([t,n])=>{S.miss[t]=(S.miss[t]||0)+n;});
+      Object.keys(o.cel||{}).forEach(id=>{(S.cel=S.cel||{})[pre+id]=1;});Object.keys(o.shown||{}).forEach(id=>{(S.shown=S.shown||{})[pre+id]=1;});
+    }catch(e){}});
+  save();
+})();
+
+/* ===== 記録をGoogleスプレッドシートへ送る（ほかの数学アプリと同じ送り先・同じ合言葉） ===== */
+var ML={cfg:"math-log-cfg",q:"math-log-queue",snap:"math-log-snap",weak:"math-log-weak"};
+function mlCfg(){try{return JSON.parse(localStorage.getItem(ML.cfg))||{};}catch(e){return {};}}
+function mlSetCfg(c){try{localStorage.setItem(ML.cfg,JSON.stringify(c));}catch(e){}}
+function mlQ(){try{return JSON.parse(localStorage.getItem(ML.q))||[];}catch(e){return [];}}
+function mlStrip(h){return String(h==null?"":h).replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim();}
+function mlLog(row){row.t=new Date().toISOString();row.app=row.app||"数学ワークサポート";var q=mlQ();q.push(row);if(q.length>800)q=q.slice(-800);try{localStorage.setItem(ML.q,JSON.stringify(q));}catch(e){}mlFlush();}
+var mlBusy=false;
+function mlPost(c,body,cors){return fetch(c.url,{method:"POST",mode:cors?"cors":"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)});}
+function mlFlush(){var c=mlCfg();if(!c.url||!c.key||mlBusy)return;var q=mlQ();if(!q.length)return;var batch=q.slice(0,40);mlBusy=true;
+  mlPost(c,{key:c.key,rows:batch}).then(function(){var q2=mlQ();q2.splice(0,batch.length);try{localStorage.setItem(ML.q,JSON.stringify(q2));}catch(e){}mlBusy=false;c=mlCfg();c.sent=(c.sent||0)+batch.length;c.last=new Date().toISOString();mlSetCfg(c);if(q2.length)mlFlush();}).catch(function(){mlBusy=false;});}
+function mlSnapshot(force){var c=mlCfg();if(!c.url||!c.key)return Promise.resolve(-1);if(!force&&localStorage.getItem(ML.snap))return Promise.resolve(0);
+  if(!c.dev){c.dev=(/Mobi|Android|iPhone|iPad/.test(navigator.userAgent)?"スマホ":"パソコン")+"-"+Math.random().toString(36).slice(2,6);mlSetCfg(c);}
+  var skip=/^(math-log-|heimen-zukei-embed)/,items=[];
+  for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(!k||skip.test(k))continue;var v=localStorage.getItem(k)||"";var n=Math.max(1,Math.ceil(v.length/40000));for(var p=0;p<n;p++)items.push({dev:c.dev,origin:location.origin,k:k,part:p+1,total:n,data:v.slice(p*40000,(p+1)*40000)});}
+  var chain=Promise.resolve();for(var j=0;j<items.length;j+=3){(function(g){chain=chain.then(function(){return mlPost(c,{key:c.key,snapshot:g});});})(items.slice(j,j+3));}
+  return chain.then(function(){try{localStorage.setItem(ML.snap,new Date().toISOString());}catch(e){}return items.length;});}
+function mlWeakCache(){try{return JSON.parse(localStorage.getItem(ML.weak))||null;}catch(e){return null;}}
+function mlWeakFetch(){var c=mlCfg();if(!c.url||!c.key)return Promise.resolve(null);var t0=Date.now();
+  return mlPost(c,{key:c.key,want:"weak"},true).then(function(r){return r.json();}).then(function(d){if(d&&d.ok&&d.weak){try{localStorage.setItem(ML.weak,JSON.stringify({at:Date.now(),weak:d.weak}));}catch(e){}
+    var pend=mlQ().map(function(r){return r.id+'|'+r.t;});S.wd=(S.wd||[]).filter(function(x){return x.t>t0||pend.indexOf(x.id+'|'+x.iso)>=0;});save();return d.weak;}return null;}).catch(function(){return null;});}
+
+/* ===== 苦手の分類（スプレッドシートの問題ID → 練習の種類） ===== */
+const SK={
+ iko:{c:'c3',label:'移項（符号を変える）',p:'iko'},waru:{c:'c3',label:'最後のわり算',p:'waru'},kakko:{c:'c3',label:'かっこ（かけ算が先・マイナス）',p:'kakko'},
+ bunsu:{c:'c3',label:'分母をはらう',p:'bunsu'},shosu:{c:'c3',label:'小数',p:'shosu'},hireishiki:{c:'c3',label:'比例式',p:'hirei'},bunshou:{c:'c3',label:'文章題を解き切る',p:'bun1'},
+ heniki:{c:'c4',label:'変域・関数',p:'heniki'},hfind:{c:'c4',label:'比例の式（x と y・符号）',p:'hirei'},zahyo:{c:'c4',label:'座標',p:'zahyo'},
+ hgraph:{c:'c4',label:'比例のグラフ',p:'hgraph'},hanfind:{c:'c4',label:'反比例の式（a = xy）',p:'han'},hantbl:{c:'c4',label:'反比例の表とグラフ',p:'hyp'},miwake:{c:'c4',label:'比例・反比例の見分け',p:'riyo'}
+};
+// 前に記録したワークのまちがい（スプレッドシートの問題ID）
+const IDMAP={'hirei-m1':'hantbl','hirei-m2':'hantbl','hirei-m3':'miwake','hirei-m4':'hanfind','hirei-m5':'hgraph','hirei-m6':'hgraph',
+ 'hirei-s1':'miwake','hirei-s2':'miwake','hirei-s3':'hanfind','hirei-s4':'hanfind','hirei-s5':'miwake','hirei-s6':'miwake','hirei-s7':'zahyo','hirei-s8':'zahyo','hirei-s9':'zahyo',
+ 'hirei-p1':'hfind','hirei-p2':'hfind','hirei-p3':'hfind','hirei-p4':'hfind','hirei-p5':'hfind','hirei-p6':'hfind',
+ 'hirei-h1':'hanfind','hirei-h2':'hanfind','hirei-h3':'hanfind','hirei-h4':'hanfind','hirei-h5':'hanfind','hirei-h6':'hantbl','hirei-h7':'hantbl',
+ 'eq-frac':'bunsu','eq-sign':'iko','ratio-water':'bunshou'};
+function skillOf(id){if(IDMAP[id])return IDMAP[id];const m=/^(c[34])-(s\d+|boss)-(\d+)$/.exec(id||'');if(!m)return null;
+  const st=CH[m[1]].stages.find(s=>s.id===m[1]+'-'+m[2]);const a=st&&st.acts[+m[3]];return a?a.sk:null;}
+function recLocal(id,res){S.wk=S.wk||{};const o=S.wk[id]||(S.wk[id]={x:0,ok:0,okAfter:0,last:''});
+  if(res==='×'){o.x++;o.okAfter=0;}else{o.ok++;o.okAfter++;}o.last=res;(S.wd=S.wd||[]).push({id,res,t:Date.now(),iso:''});save();}
+function logResult(id,unit,sk,q,res,memo){const row={unit,pat:(SK[sk]||{}).label||'',id,q:mlStrip(q).slice(0,200),res,ans:'',got:'',ref:'',memo};
+  mlLog(row);recLocal(id,res);const d=S.wd[S.wd.length-1];d.iso=row.t;save();}
+function weakList(){
+  const cache=mlWeakCache(),base={};
+  ((cache&&cache.weak)||[]).forEach(o=>{if(skillOf(o.id))base[o.id]={id:o.id,x:+o.x||1,okAfter:+o.okAfter||0,last:o.last||'×',src:'sheet'};});
+  Object.entries(S.wk||{}).forEach(([id,o])=>{if(!base[id]&&skillOf(id))base[id]=Object.assign({id,src:'local'},o);});
+  (S.wd||[]).forEach(d=>{const o=base[d.id];if(!o||o.src!=='sheet')return;if(d.res==='×'){o.x++;o.okAfter=0;o.last='×';}else{o.okAfter++;o.last='○';}});
+  return Object.values(base).filter(o=>o.last==='×'||(o.x>=2&&o.okAfter<2)).map(o=>Object.assign(o,{sk:skillOf(o.id),need:o.last==='×'?(o.x>=2?2:1):2-o.okAfter}));
+}
+function weakBySkill(){const g={};weakList().forEach(o=>{(g[o.sk]=g[o.sk]||[]).push(o);});
+  return Object.entries(g).map(([sk,l])=>({sk,l,x:l.reduce((a,o)=>a+o.x,0)})).sort((a,b)=>b.x-a.x);}
+
+/* ===== 苦手トレーニングの問題（毎回ちがう数で作る） ===== */
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),pk=a=>a[Math.floor(Math.random()*a.length)],nz=(a,b)=>{let v=0;while(!v)v=ri(a,b);return v;};
+const linS=(a,b)=>{let s=a?(a===1?'x':a===-1?'-x':a+'x'):'';if(b)s+=(s?(b>0?'+':'-'):(b<0?'-':''))+Math.abs(b);return s||'0';};
+const dS=n=>String(Math.abs(n)/10);
+const nJ=v=>v<0?'−'+(-v):String(v);
+const GEN={
+ iko:()=>{const x=nz(-6,6),a=ri(2,9);let c=ri(1,9);while(c===a)c=ri(1,9);const b=nz(-15,15),d=a*x+b-c*x;
+   return Math.random()<.5?{t:'eq',d:{s:`${linS(a,b)}=${linS(c,d)}`}}:{t:'eq',d:{s:`${b}-${a}x=${linS(c,b-a*x-c*x)}`}};},
+ waru:()=>{let a=nz(-9,9);while(Math.abs(a)<2)a=nz(-9,9);let b=nz(-24,24);if(Math.random()<.6)while(b%a===0)b=nz(-24,24);const p=ri(1,9);return{t:'eq',d:{s:Math.random()<.5?`${a}x=${b}`:`${a}x+${p}=${b+p}`}};},
+ kakko:()=>{const x=nz(-5,5);if(Math.random()<.5){const k=pk([2,3,4,5,-2,-3,-4]),p=nz(-6,6);let c=ri(1,6);while(c===k)c=ri(1,6);return{t:'eq',d:{s:`${k}(${linS(1,p)})=${linS(c,k*(x+p)-c*x)}`}};}
+   const m=ri(2,12),k=ri(2,5),q=ri(1,6),c=ri(1,6),v=m-k*(x-q);return{t:'eq',d:{s:`${m}-${k}(x-${q})=${linS(c,v-c*x)}`}};},
+ bunsu:()=>{const q=pk([2,3,4]);let s=pk([2,3,4,6]);while(s===q)s=pk([2,3,4,6]);const v=ri(-3,3),x=nz(-6,6),p=q*v-x,r=s*v-x;
+   return Math.random()<.6?{t:'eq',d:{s:`(${linS(1,p)})/${q}=(${linS(1,r)})/${s}`}}:{t:'eq',d:{s:`x-(${linS(1,p)})/${q}=${x-v}`}};},
+ shosu:()=>{const x=nz(-5,5);if(Math.random()<.5){const k=pk([2,3,4,5]),m=ri(2,6),p=nz(-9,9),n=k*(m*x+p);return{t:'eq',d:{s:`0.${k}(${linS(m,p)})=${n<0?'-':''}${dS(n)}`}};}
+   let A=nz(-9,9),C=nz(-9,9);while(C===A)C=nz(-9,9);const B=nz(-30,30),D=A*x+B-C*x,sd=(a,b)=>`${a<0?'-':''}${dS(a)}x${b?(b<0?'-':'+')+dS(b):''}`;return{t:'eq',d:{s:`${sd(A,B)}=${sd(C,D)}`}};},
+ hireishiki:()=>{const a=ri(2,7);let b=ri(2,9);while(b===a)b=ri(2,9);const t=ri(1,5),r=Math.random();
+   if(r<.34)return{t:'eq',d:{s:`x:${b*t}=${a}:${b}`}};if(r<.67){const x=nz(-6,8),p=a*t-x;return{t:'eq',d:{s:`(${linS(1,p)}):${b*t}=${a}:${b}`}};}
+   const p=(b-a)*t;return{t:'eq',d:{s:`x:(${linS(1,p)})=${a}:${b}`}};},
+ bunshou:()=>({t:'w',d:{w:pk(Object.keys(W))}}),
+ heniki:()=>{if(Math.random()<.3)return{t:'func',d:pk(FUNCS)};
+   if(Math.random()<.55){const lo=ri(-8,8),hi=lo+ri(3,12),loI=Math.random()<.5,hiI=Math.random()<.5;
+     return{t:'ineq',d:{t:`${nJ(lo)}${loI?'以上':'より大きく'}${nJ(hi)}${hiI?'以下':(loI?'未満':'より小さい')}`,lo,loI,hi,hiI}};}
+   const v=ri(-8,10),k=pk([['以上','R',true],['以下','L',true],['未満','L',false],['より大きい','R',false],['より小さい','L',false]]);
+   return{t:'ineq',d:{t:nJ(v)+k[0],v,vI:k[2],dir:k[1]}};},
+ hfind:()=>{const a=PF(pk(['2','-3','4','-5','6','-2','1/2','-1/3','2/3','-3/2','3/4','-4'])),x=a.d*nz(-3,3),y=fmul(a,F(x)),r=Math.random();
+   const ask=r<.4?{x:String(a.d*nz(-4,4))}:r<.8?{y:fS(fmul(a,F(a.d*nz(-4,4))))}:null;const d={k:'hi',x:String(x),y:fS(y)};if(ask)d.ask=ask;return{t:'find',d};},
+ hanfind:()=>{const a=pk([6,8,12,18,24,-6,-8,-12,-18,-24,36,-36]),dv=[];for(let i=1;i<=Math.abs(a);i++)if(Math.abs(a)%i===0)dv.push(i);
+   const x=pk(dv)*pk([1,-1]),r=Math.random(),d={k:'han',x:String(x),y:String(a/x)};
+   if(r<.4)d.ask={x:String(pk(dv)*pk([1,-1]))};else if(r<.8)d.ask={y:String(pk(dv)*pk([1,-1]))};return{t:'find',d};},
+ zahyo:()=>{const pts=[],used={};['A','B','C'].forEach(n=>{let x,y;do{x=ri(-6,6);y=ri(-6,6);if(Math.random()<.2)x=0;else if(Math.random()<.2)y=0;}while(used[x+','+y]);used[x+','+y]=1;pts.push([n,x,y]);});
+   return{t:'plot',d:{mode:Math.random()<.5?'plot':'read',pts}};},
+ hgraph:()=>Math.random()<.6?{t:'line',d:{a:pk(['2','-3','1/2','-2/3','3/4','-5/2','4/3','-1/3','3','-1/2','2/5','-4/3'])}}:{t:'line',d:{a:pk(['-2/3','5/2','-3/4','1/3','-4','3/2','2','-1/2']),read:true}},
+ hantbl:()=>{if(Math.random()<.6){const a=pk([4,6,-4,-6]);return{t:'hyper',d:{a,xs:Math.abs(a)===6?[-6,-3,-2,-1,1,2,3,6]:[-4,-2,-1,1,2,4]}};}
+   const a=pk([6,8,12,-6,-8,-12]),pp={6:[[1,6],[2,3],[3,2],[6,1]],8:[[2,4],[4,2]],12:[[2,6],[3,4],[4,3],[6,2]]}[Math.abs(a)];const pt=pk(pp).slice();if(a<0)pt[1]=-pt[1];
+   const on=Math.random()<.5,q=pk(pp.filter(p=>p[0]!==Math.abs(pt[0])))||pp[0],ck=on?[String(q[0]),String(a<0?-q[1]:q[1])]:[String(q[0]),String((a<0?-q[1]:q[1])+1)];
+   return{t:'hyper',d:{read:true,a,pt,check:ck}};},
+ miwake:()=>{if(Math.random()<.5){const a=pk([2,3,4,5,-2,-3,-4]),xs=[1,2,3,4];return{t:'word',d:{story:'次の表は比例？ 反比例？',xl:'x',yl:'y',xs:xs.map(String),ys:xs.map(v=>String(a*v)),kind:'hi',a:String(a),steps:['kind','a'],why:`x が2倍で y も2倍。y=${a}x。`}};}
+   const a=pk([12,24,-12,-24,18,36,-18]),xs=Math.abs(a)%4===0?[1,2,3,4]:[1,2,3,6];
+   return{t:'word',d:{story:'次の表は比例？ 反比例？',xl:'x',yl:'y',xs:xs.map(String),ys:xs.map(v=>fS(F(a,v))),kind:'han',a:String(a),steps:['kind','a'],why:`x が2倍で y は[1|2]倍。積がいつも ${a}。`}};}
+};
+const FUNCS=[
+ {t:'1辺が x cm の正方形の面積を y cm²',demo:[[1,[1]],[2,[4]],[3,[9]]],ans:true,why:'1辺を決めると面積はただ1つ。関数。'},
+ {t:'自然数 x の倍数を y',demo:[[2,[2,4,6,'…']],[3,[3,6,9,'…']]],ans:false,why:'y がいくつもある。1つに決まらないので関数ではない。'},
+ {t:'1個 80円のパンを x 個買ったときの代金を y 円',demo:[[1,[80]],[3,[240]]],ans:true,why:'個数を決めると代金はただ1つ。関数。'},
+ {t:'x 歳の人の身長を y cm',demo:[[13,['150','158','163','…']]],ans:false,why:'同じ13歳でも身長は人によってちがう。関数ではない。'},
+ {t:'周の長さが x cm の長方形の面積を y cm²',demo:[[12,['9','8','5','…']]],ans:false,why:'周が12cmでも、3×3、2×4、1×5…と面積はいくつもある。関数ではない。'},
+ {t:'40ページの問題集を x ページ解いたときの残りを y ページ',demo:[[10,[30]],[25,[15]]],ans:true,why:'残りはただ1つ。関数。'}
+];
+function genItem(sk){const g=GEN[sk]();g.title=SK[sk].label;return g;}
+function qText(it){const d=it.d||{};if(it.t==='eq')return d.s;if(it.t==='w')return (d.word||W[d.w]||{}).story||'';
+  if(it.t==='find')return `${d.k==='hi'?'比例':'反比例'} x=${d.x} y=${d.y}`+(d.ask?` ask ${JSON.stringify(d.ask)}`:'');
+  if(it.t==='ineq')return d.t;if(it.t==='func')return d.t;if(it.t==='plot')return d.mode+' '+d.pts.map(p=>p.join('')).join(' ');
+  if(it.t==='line')return (d.read?'read ':'draw ')+'y='+d.a+'x';if(it.t==='hyper')return (d.read?'read ':'table ')+'y='+d.a+'/x';if(it.t==='word')return d.story;return it.title||'';}
+
+/* ===== 画面 ===== */
+const app=document.getElementById('app');
+let view={name:'home'};
+function topbar(){return`<div class="top"><h1>数学ワークサポート</h1><button class="small" id="snd">${S.sound?'音：オン':'音：オフ'}</button></div>`;}
+function bindTop(){const b=document.getElementById('snd');if(b)b.onclick=()=>{S.sound=!S.sound;save();b.textContent=S.sound?'音：オン':'音：オフ';};}
+const BLOCK=(o,big)=>{const n=Math.min(4,o.x),cr=['M14 6 L22 20 L17 28','M44 10 L36 22 L42 34','M10 40 L22 36 L26 48','M50 44 L40 40 L36 52'];
+  return`<svg class="blk ${big?'big':''}" viewBox="0 0 60 60" data-bid="${o.id}" aria-label="苦手ブロック"><rect x="3" y="3" width="54" height="54" rx="6" class="bk"/><rect x="9" y="9" width="42" height="42" rx="3" class="bk2"/>${cr.slice(0,n).map((d,i)=>`<path class="crack" data-cr="${i}" d="${d}"/>`).join('')}</svg>`;};
+
+function home(){
+  useCh(view.c||S.ch||'c4');
+  const nc=STAGES.filter(cleared).length,ni=nextIdx(),nx=STAGES[ni];
+  let h=topbar()+`<p class="muted" style="margin:0 0 8px">2学期期末テストの数学（3章 方程式・4章 比例と反比例）。章ごとに<b>ステージ1から順番に</b>進みます。</p>`;
+  // 苦手をつぶす
+  const wb=weakBySkill(),cfg=mlCfg(),cache=mlWeakCache();
+  h+=`<div class="weakcard"><div class="wkhead"><h3>苦手をつぶす</h3><span class="muted" style="font-size:13px">${cfg.url?(cache?'記録（スプレッドシート）とつながっています　'+new Date(cache.at).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'記録を読みこみ中…'):'この端末の記録だけで表示中'}</span></div>`;
+  if(!wb.length)h+=`<p class="muted" style="margin:4px 0 0">いま苦手のブロックはありません。ステージでまちがえた問題は、ここにひびの入ったブロックで出てきます。</p>`;
+  else{h+=`<p class="muted" style="margin:2px 0 8px;font-size:14px">ひびの数は、まちがえた回数。ちがう数の問題を続けて正解すると、ブロックが直って「卒業」。</p>`;
+    h+=wb.map(g=>`<div class="wkrow"><div class="wkname"><b>${SK[g.sk].label}</b><span class="muted">${CH[SK[g.sk].c].name.slice(0,2)}・${g.l.length}ブロック</span></div><div class="wkblocks">${g.l.slice(0,8).map(o=>BLOCK(o)).join('')}${g.l.length>8?`<span class="muted">+${g.l.length-8}</span>`:''}</div><button class="btn" data-drill="${g.sk}">直す</button></div>`).join('');}
+  h+=`</div>`;
+  // 章のタブ
+  h+=`<div class="chtabs">${Object.values(CH).map(c=>{const n=c.stages.filter(cleared).length;return`<button class="${c.id===CUR.id?'on':''}" data-ch="${c.id}">${c.name}<small>${n} / ${c.stages.length}</small></button>`;}).join('')}</div>`;
+  h+=`<p class="muted" style="margin:0 0 4px;font-size:14px">${CUR.name}（${CUR.pages}）。1日1ステージ（20分くらい）が目安。</p>`;
+  h+=`<div class="bar" aria-label="クリアしたステージ"><span style="width:${nc/STAGES.length*100}%"></span></div><div class="muted" style="font-size:14px">${nc} / ${STAGES.length} ステージ クリア</div>`;
+  h+=nc===STAGES.length?`<div class="today"><div class="lbl">${CUR.name} 全ステージ クリア！</div><div class="nm">あとは苦手つぶしとワークの直し</div><button class="btn big" data-go="${ni}">ボスにもう一度いどむ</button></div>`
+    :`<div class="today"><div class="lbl">次はここ</div><div class="nm">${nx.boss?'':'ステージ'+(ni+1)+'　'}${nx.name}</div><div class="muted" style="margin:-6px 0 10px">${nx.sub}</div><button class="btn big" data-go="${ni}">はじめる</button></div>`;
+  h+=`<h3>ステージの順番</h3><ol class="map">${STAGES.map((s,i)=>{const c=cleared(s),n=i===ni&&!c;
+    return`<li><button class="node ${c?'clear':''} ${n?'next':''} ${s.boss?'boss':''}" data-go="${i}">
+      <span class="dot">${c?'✓':s.boss?'B':i+1}</span><span class="txt"><b>${s.name}</b><span>${s.sub}</span></span>
+      <span class="badge">${c?'クリア':n?'次はここ':''}</span></button></li>`;}).join('')}</ol>`;
+  h+=`<div class="card" style="margin-top:18px"><h3>紙に書くときの4つのきまり</h3><ol class="rules">
+    <li>1行に、変形は1つだけ</li><li>「＝」をたてにそろえる</li><li>移項した項は、符号が変わったか指でさして確かめる</li><li>答えが出たら、もとの式に入れて「たしかめ算」。文章題は単位まで</li></ol></div>`;
+  // おうちの人用
+  const mq=mlQ().length;
+  h+=`<details class="card" style="margin-top:10px"><summary>記録の送り先（おうちの人用）${cfg.url?'　<span class="muted" style="font-size:13px">設定ずみ</span>':''}</summary>
+    <p class="muted" style="font-size:14px">1問ごとの結果（○・×）を、Googleスプレッドシート「拓真 数学まちがい記録」に送る。平面図形のアプリと同じ送り先・同じ合言葉。同じサイトに置けば、設定はそのまま使われる。名前は送らない。</p>
+    <p><label style="font-size:14px">ウェブアプリのURL<br><input id="mlurl" style="width:100%;font-size:14px" value="${(cfg.url||'').replace(/"/g,'')}" placeholder="https://script.google.com/macros/s/……/exec"></label></p>
+    <p><label style="font-size:14px">合言葉<br><input id="mlkey" style="width:14em;font-size:14px" value="${(cfg.key||'').replace(/"/g,'')}"></label> <button class="btn" id="mlsave" style="font-size:14px;padding:4px 12px">保存して送る</button></p>
+    <p class="muted" style="font-size:13px" id="mlstat">まだ送っていない記録：${mq} 件${cfg.last?'　最後に送った日時：'+new Date(cfg.last).toLocaleString('ja-JP'):''}</p></details>`;
+  app.innerHTML=h;bindTop();
+  const k=CUR.id;S.posC=S.posC||{};S.pctC=S.pctC||{};S.pos=S.posC[k];S.pct=S.pctC[k];homeAnim(nc,ni);S.posC[k]=S.pos;S.pctC[k]=S.pct;save();
+  if(!RM)app.querySelectorAll('.weakcard .blk').forEach((b,i)=>b.animate([{transform:'translateY(-30px)',opacity:0},{transform:'translateY(4px)',opacity:1,offset:.7},{transform:'none'}],{duration:450,delay:150+i*50,easing:'ease-in',fill:'backwards'}));
+  app.querySelectorAll('[data-ch]').forEach(b=>b.onclick=()=>{view={name:'home',c:b.dataset.ch};fx.swoosh();render();});
+  app.querySelectorAll('[data-drill]').forEach(b=>b.onclick=()=>{view={name:'drill',sk:b.dataset.drill,intro:true};render();window.scrollTo({top:0});});
+  app.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{const i=+b.dataset.go;const r=stS(STAGES[i].id);
+    view={name:'stage',c:CUR.id,i,step:STAGES[i].boss?1:(r.point?(stDone(STAGES[i])?2:1):0),p:items(STAGES[i]).findIndex((_,j)=>!r.done[j])};if(view.p<0)view.p=0;render();window.scrollTo({top:0});});
+  const ms=document.getElementById('mlsave');if(ms)ms.onclick=()=>{const u=document.getElementById('mlurl').value.trim(),kk=document.getElementById('mlkey').value.trim();
+    if(u&&!/^https:\/\/script\.google\.com\/macros\/s\/[^\/]+\/exec$/.test(u)){alert('URL は https://script.google.com/macros/s/……/exec の形で入れてください');return;}
+    const c=mlCfg();c.url=u;c.key=kk;mlSetCfg(c);mlFlush();const st=document.getElementById('mlstat');st.textContent='送っています…';
+    mlSnapshot(false).then(()=>mlWeakFetch()).then(w=>{st.textContent=w?'つながりました（スプレッドシートの苦手 '+w.length+' 問）。':'スプレッドシートの返事が読めませんでした。URL と合言葉を確かめてください。';});};
+}
+
+function homeAnim(nc,ni){
+  const pct=nc/STAGES.length*100,bar=app.querySelector('.bar>span');
+  if(!RM&&bar&&S.pct!=null&&S.pct!==pct)bar.animate([{width:S.pct+'%'},{width:pct+'%'}],{duration:900,delay:300,easing:'ease-out',fill:'backwards'});
+  S.pct=pct;S.shown=S.shown||{};
+  const dots=app.querySelectorAll('.map .dot');let k=0;
+  STAGES.forEach((s,i)=>{if(cleared(s)&&!S.shown[s.id]){S.shown[s.id]=1;const d=dots[i];
+    if(!RM&&d){const dl=300+k*180;d.animate([{transform:'scale(2.4) rotate(-30deg)',opacity:0},{transform:'scale(1) rotate(0)',opacity:1}],{duration:420,delay:dl,easing:'cubic-bezier(.34,1.56,.64,1)',fill:'backwards'});setTimeout(()=>fx.stamp(),dl+250);k++;}}});
+  const map=app.querySelector('.map'),lis=map.querySelectorAll('li');
+  const tk=document.createElement('div');tk.className='runner';tk.innerHTML=RUNNER;map.appendChild(tk);
+  const target=nc===STAGES.length?lis.length-1:ni,yOf=i=>lis[i].offsetTop+(lis[i].offsetHeight-46)/2;
+  tk.style.top=yOf(target)+'px';
+  if(!RM&&S.pos!=null&&S.pos!==target&&lis[S.pos]){
+    const n=Math.abs(target-S.pos),fr=[],base=yOf(target);
+    for(let j=0;j<=n;j++){const y=yOf(S.pos+(target>S.pos?j:-j))-base;fr.push({transform:`translateY(${y}px)`,offset:j/n});
+      if(j<n){const y2=(y+yOf(S.pos+(target>S.pos?j+1:-(j+1)))-base)/2-24;fr.push({transform:`translateY(${y2}px) scaleY(1.1)`,offset:(j+.5)/n});}}
+    const dl=600+k*180;tk.animate(fr,{duration:n*420,delay:dl,easing:'ease-in-out',fill:'backwards'});
+    for(let j=0;j<n;j++)setTimeout(()=>tone([[520+j*80,.08,'sine',780+j*80]]),dl+j*420+150);
+  }
+  S.pos=target;
+}
+
+function pointHTML(p){
+  let h=`<div class="card"><h3>${p.name}</h3><p style="margin:0"><span class="rule">${md(p.rule)}</span></p><div class="ex">
+    <div class="bad"><span class="tag">悪い例</span><div class="eqt">${p.bad.map((l,j)=>`<span class="ln ${j===p.bx?'x':''}">${md(l)}</span>`).join('')}</div><p class="note">${p.note}</p></div>
+    <div class="good"><span class="tag">いい例</span><div class="eqt">${p.good.map((l,j)=>`<span class="ln ${j===p.gh?'hi':''}">${md(l)}</span>`).join('')}</div></div></div>`;
+  if(p.quiz)h+=`<div style="margin-top:12px;border-top:1px dotted var(--line);padding-top:10px" id="qz"><b>まちがい探し：</b>まちがっている行をタップ
+    <div class="eqt">${p.quiz.map((l,j)=>`<button class="qline" data-j="${j}">${md(l)}</button>`).join('')}</div><div class="fb" id="qfb"></div></div>`;
+  return h+'</div>';
+}
+function bindQuiz(p){const qz=document.getElementById('qz');if(!qz)return;const fb=document.getElementById('qfb');
+  qz.querySelectorAll('.qline').forEach(b=>b.onclick=()=>{const j=+b.dataset.j;
+    if(j===0){fb.className='fb ng';fb.textContent='1行目は問題の式。2行目から見よう。';fx.ng();}
+    else if(j===p.w){b.classList.add('right');fb.className='fb ok';fb.innerHTML='見つけた！ '+md(p.why);fx.ok();const c=ctr(b.getBoundingClientRect());burst(c.x,c.y,cv('--red'),12,60);}
+    else{b.classList.add('nope');shake(b);fb.className='fb ng';fb.textContent='その行は合っている。';fx.ng();}});}
+
+function stage(){
+  useCh(view.c);
+  const st=STAGES[view.i],r=stS(st.id),list=items(st);
+  let h=`<button class="back" id="back">← ${CUR.name} のステージにもどる</button>`;
+  h+=`<h2>${st.boss?'':'ステージ'+(view.i+1)+'　'}${st.name}</h2><p class="muted" style="margin:0">${CUR.name}　${st.sub}</p>`;
+  const labels=st.boss?['','たたかう','紙でやる']:['① ポイント','② さわって解く','③ 紙でやる'];
+  const oks=[r.point,stDone(st),paperDone(st)];
+  h+=`<div class="steps">${labels.map((l,k)=>l?`<button class="${view.step===k?'on':''} ${oks[k]?'ok':''}" data-step="${k}">${l}</button>`:'').join('')}</div>`;
+  if(view.step===0){
+    h+=pointHTML(P[st.pt])+`<button class="btn big" id="toSolve">わかった → ② さわって解く</button>`;
+  }else if(view.step===1){
+    if(st.boss){const left=list.filter((_,j)=>!r.done[j]).length;
+      h+=`<div class="bosshead"><svg class="boss-idle" viewBox="0 0 80 80" aria-hidden="true"><rect x="8" y="12" width="64" height="58" rx="10" fill="var(--ink)"/><rect x="18" y="28" width="14" height="12" fill="var(--paper)"/><rect x="48" y="28" width="14" height="12" fill="var(--paper)"/><rect x="22" y="31" width="6" height="6" fill="var(--red)"/><rect x="52" y="31" width="6" height="6" fill="var(--red)"/><rect x="24" y="52" width="32" height="6" fill="var(--paper)"/><text x="40" y="10" text-anchor="middle" font-size="10" fill="var(--red)">${left?'':'たおした'}</text></svg>
+        <div class="hp"><b>章末テストのボス</b><div class="hpbar">${list.map((_,j)=>`<span class="${r.done[j]?'off':''}"></span>`).join('')}</div>
+        <div class="hearts" aria-label="ライフ">${'♥'.repeat(view.hearts??3)}${'♡'.repeat(3-(view.hearts??3))}</div></div></div>`;}
+    h+=`<div class="chips">${list.map((it,j)=>`<button class="chip ${r.done[j]?'done':''} ${j===view.p?'cur':''}" data-p="${j}">${it.title||j+1}</button>`).join('')}</div>`;
+    h+=`<div class="card" id="play"></div>`;
+  }else{
+    h+=`<div class="card"><h3>紙でやる</h3><p class="muted" style="margin-top:0">アプリでやった型を、ワークに書いて解こう。終わったらチェック。</p><ul class="plist">${st.paper.map((p,k)=>`<li><input type="checkbox" id="pp${k}" ${r.paper[k]?'checked':''}><label for="pp${k}">${p}</label></li>`).join('')}</ul></div>`;
+    if(cleared(st))h+=`<div class="clearbox"><b>ステージクリア！</b><div>${view.i<STAGES.length-1?'次のステージへ進もう。':'全部クリア！'}</div><p><button class="btn" id="nextSt">${view.i<STAGES.length-1?'次のステージへ':'ステージの順番を見る'}</button></p></div>`;
+  }
+  app.innerHTML=topbar()+h;bindTop();
+  stageAnim(st);
+  document.getElementById('back').onclick=()=>{view={name:'home',c:CUR.id};render();};
+  app.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{view.step=+b.dataset.step;render();});
+  const ts=document.getElementById('toSolve');if(ts)ts.onclick=()=>{r.point=true;save();view.step=1;fx.ok();render();};
+  bindQuiz(P[st.pt]);
+  app.querySelectorAll('.chip[data-p]').forEach(b=>b.onclick=()=>{view.p=+b.dataset.p;render();});
+  app.querySelectorAll('.plist input').forEach((c,k)=>c.onchange=()=>{r.paper[k]=c.checked;save();if(c.checked){fx.ok();const cc=ctr(c.getBoundingClientRect());burst(cc.x,cc.y,cv('--ok'),8,30);}render();});
+  const ns=document.getElementById('nextSt');if(ns)ns.onclick=()=>{if(view.i<STAGES.length-1){view={name:'stage',c:CUR.id,i:view.i+1,step:0,p:0};if(STAGES[view.i].boss)view.step=1;}else view={name:'home',c:CUR.id};render();window.scrollTo({top:0});};
+  if(view.step===1)startPlay(st,list,r);
+}
+
+function stageAnim(st){
+  if(view.lastStep!==view.step||view.lastI!==view.i){
+    if(!RM){const cards=app.querySelectorAll('.steps ~ *');cards.forEach((c,i)=>c.animate([{transform:'translateX(24px)',opacity:0},{transform:'none',opacity:1}],{duration:380,delay:i*60,easing:'ease-out',fill:'backwards'}));
+      if(view.step===0){app.querySelectorAll('.good .ln').forEach((l,i)=>l.animate([{transform:'translateY(10px)',opacity:0},{transform:'none',opacity:1}],{duration:360,delay:900+i*280,fill:'backwards'}));
+        app.querySelectorAll('.bad .ln').forEach((l,i)=>l.animate([{opacity:0},{opacity:1}],{duration:300,delay:200+i*150,fill:'backwards'}));}}
+    view.lastStep=view.step;view.lastI=view.i;}
+  if(view.step===2&&cleared(st)){S.cel=S.cel||{};if(!S.cel[st.id]){S.cel[st.id]=1;save();setTimeout(()=>{banner(st.boss?'ボス撃破！':'ステージクリア！');confetti(90);fx.win();},200);
+    const cb=app.querySelector('.clearbox');if(cb&&!RM)cb.animate([{transform:'scale(.5)',opacity:0},{transform:'scale(1.06)',opacity:1,offset:.7},{transform:'none'}],{duration:600,delay:300,fill:'backwards'});}}
+}
+
+function startPlay(st,list,r){
+  const el=document.getElementById('play'),it=list[view.p];const tok=view,pp=view.p;let missed=0;const mt=[];
+  const onMiss=(t)=>{missed++;if(t)mt.push(t);if(!st.boss||view!==tok||view.p!==pp)return;view.hearts=(view.hearts??3)-1;
+    const hs=app.querySelector('.hearts');if(hs){hs.textContent='♥'.repeat(Math.max(0,view.hearts))+'♡'.repeat(3-Math.max(0,view.hearts));shake(hs);
+      const rr=hs.getBoundingClientRect();floatText(rr.left+60,rr.top,'−♥');
+      if(!RM)fxl.animate([{boxShadow:'inset 0 0 0 0 transparent'},{boxShadow:`inset 0 0 60px 10px ${cv('--red')}`},{boxShadow:'inset 0 0 0 0 transparent'}],{duration:500});}
+    if(view.hearts<=0){view.hearts=3;setTimeout(()=>{alertBox('ライフがなくなった！ この問題を最初からもう一度。');render();},500);}};
+  const onClear=()=>{r.done[pp]=true;save();
+    logResult(`${st.id}-${pp}`,CUR.unit,it.sk,qText(it),missed?'×':'○',`ステージ ${st.name}`+(mt.length?`（ミス：${[...new Set(mt)].join('・')}）`:''));
+    if(view!==tok||view.p!==pp||view.step!==1)return;
+    if(missed&&!st.boss){const c=ctr(el.getBoundingClientRect());floatText(c.x,c.y,'苦手ブロックに追加',cv('--gold'));}
+    const nx=list.findIndex((_,j)=>!r.done[j]);
+    if(st.boss){fx.hit();const b=app.querySelector('.bosshead svg');
+      if(b){const c=ctr(b.getBoundingClientRect());shake(b);if(!RM)b.animate([{filter:'brightness(2.5)'},{filter:'none'}],{duration:350});
+        floatText(c.x,c.y-30,'−1');burst(c.x,c.y,cv('--red'),16,70);
+        const seg=app.querySelectorAll('.hpbar span')[pp];if(seg&&!RM)seg.animate([{transform:'scaleX(1)',opacity:1},{transform:'scaleX(0)',opacity:.15}],{duration:500,delay:200,fill:'forwards'});
+        if(nx<0)setTimeout(()=>{explode(b);fx.hit();},500);}}
+    setTimeout(()=>{if(view!==tok||view.p!==pp||view.step!==1)return;if(nx<0){fx.win();view.step=2;render();window.scrollTo({top:0});}
+      else{view.p=nx;render();}},st.boss?(nx<0?1600:1000):1900);};
+  el.innerHTML=`<p class="muted" style="margin:0">${view.p+1} / ${list.length}　${it.title}</p><div id="pl"></div>`;
+  window.__act=new ACT[it.t](el.querySelector('#pl'),it.d,{onMiss,onClear});
+}
+
+/* ===== 苦手トレーニング ===== */
+function drill(){
+  const sk=view.sk,info=SK[sk];useCh(info.c);
+  const l=weakList().filter(o=>o.sk===sk);
+  let h=`<button class="back" id="back">← もどる</button><h2>苦手をつぶす：${info.label}</h2><p class="muted" style="margin:0">${CH[info.c].name}　毎回ちがう数の問題。1回でまちがえずに解けると、ブロックが1つ直る。</p>`;
+  h+=`<div class="wall">${l.length?l.map(o=>`<div class="wb ${o.id===view.tid?'tg':''}">${BLOCK(o,true)}<div class="need">${'<i class="nd"></i>'.repeat(Math.max(0,o.need))}</div></div>`).join(''):''}${(view.grads||[]).map(id=>`<div class="wb grad"><svg class="blk big" viewBox="0 0 60 60"><rect x="3" y="3" width="54" height="54" rx="6" class="gold"/><text x="30" y="37" text-anchor="middle" class="gtx">卒業</text></svg></div>`).join('')}</div>`;
+  if(!l.length){h+=`<div class="clearbox pop"><b>この苦手は全部卒業！</b><div>スプレッドシートにも ○ が記録された。</div><p><button class="btn" id="home2">もどる</button></p></div>`;app.innerHTML=topbar()+h;bindTop();
+    document.getElementById('back').onclick=document.getElementById('home2').onclick=()=>{view={name:'home',c:info.c};render();};return;}
+  if(view.intro)h+=`<details class="card" open id="pt"><summary><b>まず確認：いい例・悪い例</b></summary>${pointHTML(P[info.p])}<button class="btn" id="go">わかった → 問題へ</button></details>`;
+  else h+=`<div class="card" id="play"></div>`;
+  app.innerHTML=topbar()+h;bindTop();
+  document.getElementById('back').onclick=()=>{view={name:'home',c:info.c};render();};
+  bindQuiz(P[info.p]);
+  if(!RM)app.querySelectorAll('.wall .wb').forEach((b,i)=>b.animate([{transform:'scale(.3)',opacity:0},{transform:'none',opacity:1}],{duration:380,delay:i*70,easing:'cubic-bezier(.34,1.56,.64,1)',fill:'backwards'}));
+  const g=document.getElementById('go');if(g)g.onclick=()=>{view.intro=false;fx.ok();render();};
+  if(view.intro)return;
+  const target=l.find(o=>o.id===view.tid)||l[0];view.tid=target.id;
+  app.querySelectorAll('.wb').forEach(w=>w.classList.toggle('tg',!!w.querySelector(`[data-bid="${target.id}"]`)));
+  const it=view.cur||(view.cur=genItem(sk));const tok=view.cur;let missed=0;const mt=[];
+  const el=document.getElementById('play');
+  el.innerHTML=`<p class="muted" style="margin:0">ねらうブロック：<b style="color:var(--red)">ひびの入ったブロック</b>（あと ${target.need} 回正解で卒業）</p><div id="pl"></div>`;
+  window.__act=new ACT[it.t](el.querySelector('#pl'),it.d,{onMiss:t=>{missed++;if(t)mt.push(t);},onClear:()=>{
+    if(view.cur!==tok)return;const res=missed?'×':'○';
+    logResult(target.id,CH[info.c].unit,sk,qText(it),res,'苦手トレーニング'+(mt.length?`（ミス：${[...new Set(mt)].join('・')}）`:''));
+    const be=app.querySelector(`.wb [data-bid="${target.id}"]`),after=weakList().find(o=>o.id===target.id);
+    if(be){const c=ctr(be.getBoundingClientRect());
+      if(res==='○'){burst(c.x,c.y,cv('--ok'),14,60);fx.stamp();const cr=be.querySelectorAll('.crack');const last=cr[cr.length-1];
+        if(last&&!RM)last.animate([{opacity:1},{opacity:0}],{duration:400,fill:'forwards'});be.animate([{transform:'scale(1)'},{transform:'scale(1.25)'},{transform:'scale(1)'}],{duration:400});
+        if(!after){floatText(c.x,c.y-30,'卒業！',cv('--gold'));setTimeout(()=>{fx.win();banner('苦手卒業！',cv('--gold'));confetti(70);},350);(view.grads=view.grads||[]).push(target.id);}
+        else floatText(c.x,c.y-30,'あと'+after.need+'回',cv('--ok'));}
+      else{shake(be);floatText(c.x,c.y-30,'ひびが入った',cv('--red'));fx.hit();}}
+    setTimeout(()=>{if(view.cur!==tok)return;view.cur=null;if(!after)view.tid=null;render();window.scrollTo({top:0,behavior:RM?'auto':'smooth'});},res==='○'&&!after?2000:1500);
+  }});
+}
+
+function alertBox(t){const d=document.createElement('div');d.className='clearbox';d.style.cssText='position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:var(--card);z-index:20;max-width:90%';d.innerHTML=`<b style="color:var(--red)">${t}</b>`;document.body.appendChild(d);setTimeout(()=>d.remove(),1800);}
+
+function render(){if(view.name==='home')home();else if(view.name==='drill')drill();else stage();}
+render();
+mlFlush();mlSnapshot(false);mlWeakFetch().then(w=>{if(w&&view.name==='home'&&!(document.activeElement&&document.activeElement.matches('input')))render();});
+
+</script>
+</body>
+</html>
