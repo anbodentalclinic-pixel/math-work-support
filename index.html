@@ -279,6 +279,11 @@ i{font-family:"Times New Roman",serif;font-style:italic;font-size:1.08em}
 .wb.tg{outline:3px solid var(--red);background:var(--card)}
 .need{display:flex;gap:3px;min-height:10px}.need .nd{display:block;width:10px;height:10px;border-radius:50%;border:2px solid var(--ok)}
 details.card summary{cursor:pointer}
+.trialbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#5b3f86;color:#fff;border-radius:10px;padding:8px 12px;margin:8px 0 4px;font-size:15px}
+.trialbar .sp{flex:1}.trialbar small{opacity:.9}
+.trialbar button{background:#fff;color:#5b3f86;border:0;border-radius:8px;padding:5px 12px;font-weight:700;cursor:pointer;font-size:14px}
+body.trial .wrap{outline:4px dashed #5b3f86;outline-offset:6px}
+.trialcard{border:2px dashed #5b3f86}
 </style>
 </head>
 <body>
@@ -289,7 +294,9 @@ details.card summary{cursor:pointer}
 const KEY='math-work-support-v1';
 let S={st:{},sound:true,miss:{}};
 try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r));}catch(e){}
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}};
+/* 保護者お試しモード：お試し中は保存も送信もしない（終わると子どもの記録にもどる） */
+let TRIAL=false;const TRIAL_KEY='math-work-support-trial';
+const save=()=>{if(TRIAL)return;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}};
 const stS=id=>(S.st[id]=S.st[id]||{point:false,done:{},paper:{}});
 
 /* ===== 音 ===== */
@@ -1443,6 +1450,7 @@ function skillOf(id){if(IDMAP[id])return IDMAP[id];const m=/^(c[34])-(s\d+|boss)
 function recLocal(id,res){S.wk=S.wk||{};const o=S.wk[id]||(S.wk[id]={x:0,ok:0,okAfter:0,last:''});
   if(res==='×'){o.x++;o.okAfter=0;}else{o.ok++;o.okAfter++;}o.last=res;(S.wd=S.wd||[]).push({id,res,t:Date.now(),iso:''});save();}
 function logResult(id,unit,sk,q,res,memo){const row={unit,pat:(SK[sk]||{}).label||'',id,q:mlStrip(q).slice(0,200),res,ans:'',got:'',ref:'',memo};
+  if(TRIAL){row.t=new Date().toISOString();recLocal(id,res);S.wd[S.wd.length-1].iso=row.t;return;}
   mlLog(row);recLocal(id,res);const d=S.wd[S.wd.length-1];d.iso=row.t;save();}
 function weakList(){
   const cache=mlWeakCache(),base={};
@@ -1511,8 +1519,12 @@ function qText(it){const d=it.d||{};if(it.t==='eq')return d.s;if(it.t==='w')retu
 /* ===== 画面 ===== */
 const app=document.getElementById('app');
 let view={name:'home'};
-function topbar(){return`<div class="top"><h1>数学ワークサポート</h1><button class="small" id="snd">${S.sound?'音：オン':'音：オフ'}</button></div>`;}
-function bindTop(){const b=document.getElementById('snd');if(b)b.onclick=()=>{S.sound=!S.sound;save();b.textContent=S.sound?'音：オン':'音：オフ';};}
+function topbar(){return`<div class="top"><h1>数学ワークサポート</h1><button class="small" id="snd">${S.sound?'音：オン':'音：オフ'}</button></div>`
+  +(TRIAL?`<div class="trialbar" role="status"><b>保護者お試しモード</b><small>記録は残りません・スプレッドシートにも送りません</small><span class="sp"></span><button id="trialEnd">お試しを終わる</button></div>`:'');}
+function startTrial(){TRIAL=true;try{sessionStorage.setItem(TRIAL_KEY,'1');}catch(e){}
+  S={st:{},sound:S.sound,miss:{},wk:{},wd:[],migrated:1,shown:{},cel:{},ch:S.ch};document.body.classList.add('trial');}
+function endTrial(){try{sessionStorage.removeItem(TRIAL_KEY);}catch(e){}location.reload();}
+function bindTop(){const te=document.getElementById('trialEnd');if(te)te.onclick=endTrial;const b=document.getElementById('snd');if(b)b.onclick=()=>{S.sound=!S.sound;save();b.textContent=S.sound?'音：オン':'音：オフ';};}
 const BLOCK=(o,big)=>{const n=Math.min(4,o.x),cr=['M14 6 L22 20 L17 28','M44 10 L36 22 L42 34','M10 40 L22 36 L26 48','M50 44 L40 40 L36 52'];
   return`<svg class="blk ${big?'big':''}" viewBox="0 0 60 60" data-bid="${o.id}" aria-label="苦手ブロック"><rect x="3" y="3" width="54" height="54" rx="6" class="bk"/><rect x="9" y="9" width="42" height="42" rx="3" class="bk2"/>${cr.slice(0,n).map((d,i)=>`<path class="crack" data-cr="${i}" d="${d}"/>`).join('')}</svg>`;};
 
@@ -1539,9 +1551,18 @@ function home(){
       <span class="badge">${c?'クリア':n?'次はここ':''}</span></button></li>`;}).join('')}</ol>`;
   h+=`<div class="card" style="margin-top:18px"><h3>紙に書くときの4つのきまり</h3><ol class="rules">
     <li>1行に、変形は1つだけ</li><li>「＝」をたてにそろえる</li><li>移項した項は、符号が変わったか指でさして確かめる</li><li>答えが出たら、もとの式に入れて「たしかめ算」。文章題は単位まで</li></ol></div>`;
+  // 保護者お試しモード
+  h+=TRIAL?`<div class="card trialcard" style="margin-top:10px"><h3 style="margin-top:0">保護者お試しモード中</h3><p class="muted" style="font-size:14px">答えた結果・クリア・苦手ブロックの変化は、このタブを閉じるか「お試しを終わる」を押すと消えます。スプレッドシートにも送っていません。拓真くんの記録はそのまま残っています。</p><button class="btn" id="trialEnd2">お試しを終わる</button></div>`
+    :`<details class="card trialcard" style="margin-top:10px"><summary>保護者お試しモード（おうちの人用）</summary>
+    <ul class="muted" style="font-size:14px;padding-left:1.2em">
+      <li>まっさらな状態から、どのステージ・ボス・苦手トレーニングでも試せる</li>
+      <li>答えた結果やクリアは記録しない。スプレッドシートにも送らない</li>
+      <li>拓真くんのふだんの記録（クリアしたステージ・苦手ブロック）はそのまま。終わるともとにもどる</li>
+      <li>「苦手をつぶす」には、拓真くんの今の苦手がそのまま出る（お試しで直しても、本当の記録は変わらない）</li></ul>
+    <button class="btn" id="trialStart">お試しモードではじめる</button></details>`;
   // おうちの人用
   const mq=mlQ().length;
-  h+=`<details class="card" style="margin-top:10px"><summary>記録の送り先（おうちの人用）${cfg.url?'　<span class="muted" style="font-size:13px">設定ずみ</span>':''}</summary>
+  if(!TRIAL)h+=`<details class="card" style="margin-top:10px"><summary>記録の送り先（おうちの人用）${cfg.url?'　<span class="muted" style="font-size:13px">設定ずみ</span>':''}</summary>
     <p class="muted" style="font-size:14px">1問ごとの結果（○・×）を、Googleスプレッドシート「拓真 数学まちがい記録」に送る。平面図形のアプリと同じ送り先・同じ合言葉。同じサイトに置けば、設定はそのまま使われる。名前は送らない。</p>
     <p><label style="font-size:14px">ウェブアプリのURL<br><input id="mlurl" style="width:100%;font-size:14px" value="${(cfg.url||'').replace(/"/g,'')}" placeholder="https://script.google.com/macros/s/……/exec"></label></p>
     <p><label style="font-size:14px">合言葉<br><input id="mlkey" style="width:14em;font-size:14px" value="${(cfg.key||'').replace(/"/g,'')}"></label> <button class="btn" id="mlsave" style="font-size:14px;padding:4px 12px">保存して送る</button></p>
@@ -1553,6 +1574,8 @@ function home(){
   app.querySelectorAll('[data-drill]').forEach(b=>b.onclick=()=>{view={name:'drill',sk:b.dataset.drill,intro:true};render();window.scrollTo({top:0});});
   app.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{const i=+b.dataset.go;const r=stS(STAGES[i].id);
     view={name:'stage',c:CUR.id,i,step:STAGES[i].boss?1:(r.point?(stDone(STAGES[i])?2:1):0),p:items(STAGES[i]).findIndex((_,j)=>!r.done[j])};if(view.p<0)view.p=0;render();window.scrollTo({top:0});});
+  const tsb=document.getElementById('trialStart');if(tsb)tsb.onclick=()=>{startTrial();view={name:'home',c:CUR.id};fx.ok();render();window.scrollTo({top:0});};
+  const te2=document.getElementById('trialEnd2');if(te2)te2.onclick=endTrial;
   const ms=document.getElementById('mlsave');if(ms)ms.onclick=()=>{const u=document.getElementById('mlurl').value.trim(),kk=document.getElementById('mlkey').value.trim();
     if(u&&!/^https:\/\/script\.google\.com\/macros\/s\/[^\/]+\/exec$/.test(u)){alert('URL は https://script.google.com/macros/s/……/exec の形で入れてください');return;}
     const c=mlCfg();c.url=u;c.key=kk;mlSetCfg(c);mlFlush();const st=document.getElementById('mlstat');st.textContent='送っています…';
@@ -1698,6 +1721,7 @@ function drill(){
 function alertBox(t){const d=document.createElement('div');d.className='clearbox';d.style.cssText='position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:var(--card);z-index:20;max-width:90%';d.innerHTML=`<b style="color:var(--red)">${t}</b>`;document.body.appendChild(d);setTimeout(()=>d.remove(),1800);}
 
 function render(){if(view.name==='home')home();else if(view.name==='drill')drill();else stage();}
+try{if(sessionStorage.getItem(TRIAL_KEY))startTrial();}catch(e){}
 render();
 mlFlush();mlSnapshot(false);mlWeakFetch().then(w=>{if(w&&view.name==='home'&&!(document.activeElement&&document.activeElement.matches('input')))render();});
 
